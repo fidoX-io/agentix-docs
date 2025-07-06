@@ -1,35 +1,72 @@
 {
   "$schema": "https://mintlify.com/docs.json",
-  "theme": "mint",
+  "theme": "maple",
   "name": "Agentix Docs",
   "colors": {
-    "primary": "#16A34A",
-    "light": "#07C983",
-    "dark": "#15803D"
+    "primary": "#147acd",
+    "light": "#147acd",
+    "dark": "#147acd"
   },
   "favicon": "/favicon.png",
   "navigation": {
     "tabs": [
       {
-        "tab": "Guides",
+        "tab": "User Guide",
         "groups": [
           {
-            "group": "Get Started",
+            "group": "Getting Started",
             "pages": [
               "index",
-              "quickstart",
-              "development"
+              "user-guide/what-is-agentix",
+              "user-guide/quickstart",
+              "user-guide/navigation"
             ]
           },
           {
-            "group": "Essentials",
+            "group": "Managing Customer Journeys",
             "pages": [
-              "essentials/markdown",
-              "essentials/code",
-              "essentials/images",
-              "essentials/settings",
-              "essentials/navigation",
-              "essentials/reusable-snippets"
+              "user-guide/flows",
+              "user-guide/tasks",
+              "user-guide/agents",
+              "user-guide/tools"
+            ]
+          },
+          {
+            "group": "Operations",
+            "pages": [
+              "user-guide/reports",
+              "user-guide/notifications",
+              "user-guide/settings",
+              "user-guide/faq"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Developer Guide",
+        "groups": [
+          {
+            "group": "Getting Started",
+            "pages": [
+              "developer-guide/overview",
+              "developer-guide/setup",
+              "developer-guide/quickstart"
+            ]
+          },
+          {
+            "group": "Python SDK",
+            "pages": [
+              "developer-guide/python/install",
+              "developer-guide/python/task-lifecycle",
+              "developer-guide/python/tools",
+              "developer-guide/python/examples"
+            ]
+          },
+          {
+            "group": "JavaScript SDK (Coming Soon)",
+            "pages": [
+              "developer-guide/js/overview",
+              "developer-guide/js/roadmap"
             ]
           }
         ]
@@ -38,42 +75,33 @@
         "tab": "API Reference",
         "groups": [
           {
-            "group": "API Documentation",
+            "group": "Getting Started",
             "pages": [
-              "api-reference/introduction"
+              "api-reference/introduction",
+              "api-reference/authentication",
+              "api-reference/quickstart"
             ]
           },
           {
-            "group": "Endpoint Examples",
+            "group": "Task APIs",
             "pages": [
-              "api-reference/endpoint/get",
-              "api-reference/endpoint/create",
-              "api-reference/endpoint/delete",
-              "api-reference/endpoint/webhook"
+              "api-reference/tasks/create",
+              "api-reference/tasks/update",
+              "api-reference/tasks/status",
+              "api-reference/tasks/files"
+            ]
+          },
+          {
+            "group": "Events & Webhooks",
+            "pages": [
+              "api-reference/webhooks/room-events",
+              "api-reference/webhooks/agent-actions",
+              "api-reference/webhooks/task-status"
             ]
           }
         ]
       }
-    ],
-    "global": {
-      "anchors": [
-        {
-          "anchor": "Documentation",
-          "href": "https://mintlify.com/docs",
-          "icon": "book-open-cover"
-        },
-        {
-          "anchor": "Community",
-          "href": "https://mintlify.com/community",
-          "icon": "slack"
-        },
-        {
-          "anchor": "Blog",
-          "href": "https://mintlify.com/blog",
-          "icon": "newspaper"
-        }
-      ]
-    }
+    ]
   },
   "logo": {
     "light": "/logo/light.png",
@@ -88,8 +116,8 @@
     ],
     "primary": {
       "type": "button",
-      "label": "Dashboard",
-      "href": "https://launch.agentixhub.ai"
+      "label": "cPanel",
+      "href": "https://launch.agentixhub.ai/cpanel"
     }
   },
   "footer": {
