@@ -1,0 +1,60 @@
+---
+title: 'Configuration'
+description: 'Configure media upload settings and processing rules'
+icon: 'gear'
+---
+
+# Media Upload Configuration
+
+Configure how media files are processed and handled within your Agentix workflows.
+
+## Upload Settings
+
+### File Type Restrictions
+
+```json
+{
+  "allowedTypes": ["image/*", "video/*", "audio/*", "application/pdf"],
+  "maxFileSize": "100MB",
+  "maxFiles": 10
+}
+```
+
+### Processing Options
+
+<Accordion title="Image Processing">
+  - Automatic format conversion
+  - Resize and optimization
+  - Metadata extraction
+  - AI-powered image analysis
+</Accordion>
+
+<Accordion title="Video Processing">
+  - Format conversion
+  - Thumbnail generation
+  - Scene detection
+  - Audio extraction
+</Accordion>
+
+<Accordion title="Audio Processing">
+  - Transcription services
+  - Audio enhancement
+  - Format conversion
+  - Speaker identification
+</Accordion>
+
+## Workflow Integration
+
+Connect media upload to your existing workflows:
+
+1. **Trigger Events**: Configure when uploads trigger workflows
+2. **Data Mapping**: Map upload metadata to workflow variables
+3. **Processing Rules**: Define automatic processing actions
+4. **Output Handling**: Specify where processed files are stored
+
+## Security Settings
+
+- File scanning and virus detection
+- Access control and permissions
+- Encryption in transit and at rest
+- Audit logging and compliance

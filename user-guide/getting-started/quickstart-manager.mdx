@@ -1,0 +1,117 @@
+---
+title: 'Manager Quickstart'
+description: 'Step-by-step guide for managers to design and deploy their first customer experience journey'
+---
+
+This guide walks you through building and launching your first customer experience journey — from installing a PowerLink to launching it live via LaunchPad.
+
+## Step-by-Step Guide
+<Steps>
+   <Step title="🔐 Log in to Agentix cPanel">
+    - Open the Agentix cPanel in your browser
+    - Login using your **Manager User** credentials
+
+   ![User Login](/user-guide/images/user-login.png "User Login")
+
+    <Info>
+    *You will have access to all management features, including user, PowerLinks, workflows, and analytics management.*
+    </Info>
+  </Step>
+
+  <Step title="🛒 Browse & Install Powerlink from Store">
+    - Go to **Store** → **Catalogue**
+    - Browse ready-made PowerLinks like:
+      - 📞 **Realtime** (for live chat or calls)
+      - 📤 **Media Upload** (for document intake)
+      - 📣 **Outbound Dialer** (for outbound telephony dialing)
+    - Click **Install** to add a PowerLink to your workspace.
+
+      ![Catalogue - Install PowerLink](/user-guide/images/install-powerlink.png "Catalogue - Install PowerLink")
+
+    <Info>
+    *PowerLinks are prebuilt, configurable applications designed for specific service modes: self-service, guided, or automated.*
+    </Info>
+  </Step>
+  
+  <Step title="🧩 Create PowerLink Actions">
+    - Navigate to **PowerLinks**
+    - Select the installed PowerLink
+    - Create one or more **Actions** representing customer steps
+      - For each Action: set name and description
+
+    ![Create New Action](/user-guide/images/create-action.png "Create New Action")
+   <Info>
+    *Actions are the building blocks of your customer journey. Each Action represents a specific step in the workflow, allowing for detailed customization and control.*
+    </Info>
+  </Step>
+
+  <Step title="🧠 Assign Agent - Define Instructions, Tools & Sources">
+    - Assign an **AI-Agent** to the Action from the available agents in the PowerLink
+    - Attach any required:
+      - 🔧 **Tools** (e.g., CRM lookup, data processing)
+      - 📚 **Sources** (RAG knowledge, static files, forms)
+    - Write **agent instructions** to guide how AI-Agent responds
+
+    ![Configure Action](/user-guide/images/configure-action.png "Configure Action - Assign Agent, Define Instructions, Tools & Sources")
+
+   <Info>
+   *In addition to assigning AI-Agent, configuring instructions, sources and tools, user have several agent and application configurations available based on the selected agent and powerlink*
+   </Info>
+  </Step>
+  
+  <Step title="🛠️ Create Workflow">
+    - Go to **Workflows** → Create a new **workflow**
+    - Set **notifications** and **login behavior**
+    - Go to **Studio** → Add workflow steps - Drag and drop your defined Actions from the toolbox
+      
+
+    ![Workflow Steps](/user-guide/images/workflow-studio.png "Design Workflow Steps")
+
+    <Info>
+    *You may sequence multiple Actions to create complex workflows that guide users through multiple steps.*
+    </Info>
+  </Step>
+  
+  <Step title="🚀 Launch via LaunchPad">
+    - Copy the **Launch URL** from your workflow using the Icon: <Icon icon="copy" />
+    - Paste the copied url in new tab to start the **LaunchPad Run** app
+    - Fill the contact information, will be mandatory if notification settings enabled for this workflow
+    - Click **Let's Start** to begin
+
+    ![LaunchPad Run](/user-guide/images/launchpad-run-full.png "LaunchPad Run")   
+
+   <Info>
+    *Workflow Job can be also triggered via creating new Job from Jobs section or through the QRCode available at the Workflow page.*
+    </Info> 
+  </Step>
+  
+  <Step title="📊 Monitor Job Progress & Improve">
+    - Go to **Jobs**
+    - Track:
+      - Created Tasks and user progress in the job
+      - Job outcome
+      - Agent performance
+      - Task completion
+    - Use insights to:
+      - Adjust workflow
+      - Improve Instructions logic
+      - Add more Sources or Tools
+
+      ![Job Progress Preview](/user-guide/images/job-preview.png "Job Progress Preview")
+
+      ![Task Preview](/user-guide/images/task-preview.png "Task Preview")   
+
+  </Step>
+</Steps>
+
+---
+
+## 🧭 What's Next?
+
+- 🔍 Explore [Building Blocks](/user-guide/getting-started/building-blocks/powerlinks.mdx)
+- ➕ Install more [PowerLinks](/user-guide/powerlinks/catalogue)
+{/* - Define more sources and tools for your Actions [tools] */}
+
+---
+
+> 💡 More advanced orchestration patterns, role restrictions and fallback flows can be configured as you scale your usage.

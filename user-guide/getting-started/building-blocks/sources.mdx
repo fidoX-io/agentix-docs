@@ -1,0 +1,74 @@
+---
+title: 'Sources'
+description: 'Content sources that agents use for display, reference or interaction'
+icon: 'books'
+---
+
+## Definition
+**Sources** in Agentix provide content and context that AI agents can display, reference or use to collect input from users. They help agents act intelligently and visually—whether through showing a file, retrieving information or prompting the user to fill in structured data.
+
+
+
+## Types of Sources
+
+Agentix supports three main types of Sources:
+
+### 📄 Static Files
+
+Files that the agent can use for:
+
+- **Displaying visual content** to the user (e.g. welcome images, banners)  
+- **Sending downloadable documents** (e.g. invoices, brochures, instructions)  
+- **Referencing silently** during decision-making or tool execution  
+
+✅ Useful for: product visuals, legal disclaimers, price lists or how-to guides.
+
+
+### 🧠 KB Sources (RAG)
+
+RAG-enabled **Knowledge Base (KB) Sources** allow agents to dynamically retrieve and cite relevant information when answering user questions.
+
+Supported types:
+
+- **📄 Uploaded documents** (PDF, DOCX, TXT)  
+- **🌐 Website URLs** (crawl and embed structured pages)  
+- **🧾 Structured entries** (FAQs or indexed data via metadata)  
+- **🌍 Multi-language support** and **metadata filters**  
+
+These KB sources are indexed and embedded using advanced chunking strategies to support accurate-contextual retrieval.
+
+✅ Ideal for: policies, terms, service descriptions, internal documentation.
+
+
+### 📝 Forms
+
+Forms are structured sources used by agents to:
+
+- **Request specific user inputs** (e.g. name, phone number, ID type)  
+- **Collect and validate data** before moving to the next action  
+- **Trigger follow-up tools or decisions** based on the form result  
+
+Forms can appear during live interactions or be triggered inside a task step.
+
+✅ Ideal for: lead capture, appointment booking, document submission.
+
+
+## How Sources Are Used
+
+Sources are assigned to **Actions** and are used depending on the interaction context:
+
+- A **Realtime Agent** can show a file or ask the user to fill a form  
+- A **Task Agent** may silently pull KB data to write or summarize something  
+- Any AI agent can access RAG responses if a KB Source is configured
+
+
+## Best Practices
+
+- Use **clear names and tags** for static files for easy reference  
+- Group related files or forms by topic or action type  
+- Regularly **update KB Sources** to keep responses aligned with current info  
+- Keep forms short and focused for better user experience
+
+---
+
+> To learn how to connect sources to your agents and workflows, see the [Sources Integration Guide](/user-guide/integrations/sources).

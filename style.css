@@ -1,0 +1,29 @@
+/* Custom tag colors for Agentix PowerLinks */
+
+/* Target Mintlify's specific nav tag structure - only change text color */
+.nav-tag-pill-text[data-nav-tag="guided"] {
+  color: #147acd !important;
+}
+
+.nav-tag-pill-text[data-nav-tag="self-service"] {
+  color: #f59e0b !important;
+}
+
+.nav-tag-pill-text[data-nav-tag="automated"] {
+  color: #10b981 !important;
+}
+
+/* Also target the parent container */
+.nav-tag-pill .nav-tag-pill-text[data-nav-tag="guided"] {
+  color: #147acd !important;
+}
+
+.nav-tag-pill .nav-tag-pill-text[data-nav-tag="self-service"] {
+  color: #f59e0b !important;
+}
+
+.nav-tag-pill .nav-tag-pill-text[data-nav-tag="automated"] {
+  color: #10b981 !important;
+}
+
+

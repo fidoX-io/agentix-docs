@@ -1,130 +1,165 @@
 {
-  "$schema": "https://mintlify.com/docs.json",
-  "theme": "maple",
-  "name": "Agentix Docs",
-  "colors": {
-    "primary": "#147acd",
-    "light": "#147acd",
-    "dark": "#147acd"
-  },
-  "favicon": "/favicon.png",
-  "navigation": {
-    "tabs": [
-      {
-        "tab": "User Guide",
-        "groups": [
-          {
-            "group": "Getting Started",
-            "pages": [
-              "index",
-              "user-guide/what-is-agentix",
-              "user-guide/quickstart",
-              "user-guide/navigation"
-            ]
-          },
-          {
-            "group": "Managing Customer Journeys",
-            "pages": [
-              "user-guide/flows",
-              "user-guide/tasks",
-              "user-guide/agents",
-              "user-guide/tools"
-            ]
-          },
-          {
-            "group": "Operations",
-            "pages": [
-              "user-guide/reports",
-              "user-guide/notifications",
-              "user-guide/settings",
-              "user-guide/faq"
-            ]
-          }
-        ]
-      },
-      {
-        "tab": "Developer Guide",
-        "groups": [
-          {
-            "group": "Getting Started",
-            "pages": [
-              "developer-guide/overview",
-              "developer-guide/setup",
-              "developer-guide/quickstart"
-            ]
-          },
-          {
-            "group": "Python SDK",
-            "pages": [
-              "developer-guide/python/install",
-              "developer-guide/python/task-lifecycle",
-              "developer-guide/python/tools",
-              "developer-guide/python/examples"
-            ]
-          },
-          {
-            "group": "JavaScript SDK (Coming Soon)",
-            "pages": [
-              "developer-guide/js/overview",
-              "developer-guide/js/roadmap"
-            ]
-          }
-        ]
-      },
-      {
-        "tab": "API Reference",
-        "groups": [
-          {
-            "group": "Getting Started",
-            "pages": [
-              "api-reference/introduction",
-              "api-reference/authentication",
-              "api-reference/quickstart"
-            ]
-          },
-          {
-            "group": "Task APIs",
-            "pages": [
-              "api-reference/tasks/create",
-              "api-reference/tasks/update",
-              "api-reference/tasks/status",
-              "api-reference/tasks/files"
-            ]
-          },
-          {
-            "group": "Events & Webhooks",
-            "pages": [
-              "api-reference/webhooks/room-events",
-              "api-reference/webhooks/agent-actions",
-              "api-reference/webhooks/task-status"
-            ]
-          }
-        ]
-      }
-    ]
-  },
-  "logo": {
-    "light": "/logo/light.png",
-    "dark": "/logo/dark.png"
-  },
-  "navbar": {
-    "links": [
-      {
-        "label": "Support",
-        "href": "mailto:support@agentixhub.ai"
-      }
-    ],
-    "primary": {
-      "type": "button",
-      "label": "cPanel",
-      "href": "https://launch.agentixhub.ai/cpanel"
-    }
-  },
-  "footer": {
-    "socials": {
-      "x": "https://x.com/mintlify",
-      "github": "https://github.com/mintlify",
-      "linkedin": "https://linkedin.com/company/mintlify"
-    }
+	"$schema": "https://mintlify.com/docs.json",
+	"theme": "maple",
+	"name": "Agentix Docs",
+	"colors": {
+		"primary": "#147acd",
+		"light": "#147acd",
+		"dark": "#147acd"
+	},
+	"favicon": "/favicon.png",
+	"navigation": {
+		"tabs": [
+			{
+				"tab": "User Guide",
+				"groups": [
+					{
+						"group": "🚀 Getting Started",
+						"pages": [
+							"user-guide/getting-started/introduction",
+							{
+								"group": "Building Blocks",
+								"pages": [
+									"user-guide/getting-started/building-blocks/powerlinks",
+									"user-guide/getting-started/building-blocks/actions",
+									"user-guide/getting-started/building-blocks/agents",
+									"user-guide/getting-started/building-blocks/workflows",
+									"user-guide/getting-started/building-blocks/sources",
+									"user-guide/getting-started/building-blocks/tools",
+									"user-guide/getting-started/building-blocks/jobs",
+									"user-guide/getting-started/building-blocks/tasks"
+								]
+							},
+							"user-guide/getting-started/roles-and-access",
+							"user-guide/getting-started/quickstart-manager",
+							"user-guide/getting-started/quickstart-user"
+						]
+					},
+					{
+						"group": "⚡ PowerLinks",
+						"pages": [
+							"user-guide/powerlinks/catalogue",
+							"user-guide/powerlinks/install-powerlink",
+							{
+								"group": "Realtime",
+								"tag": "guided",
+								"icon": "microphone",
+								"pages": [
+									"user-guide/powerlinks/realtime/overview",
+									"user-guide/powerlinks/realtime/create-action",
+									"user-guide/powerlinks/realtime/assign-agent",
+									"user-guide/powerlinks/realtime/instructions",
+									"user-guide/powerlinks/realtime/sources",
+									"user-guide/powerlinks/realtime/tools",
+									"user-guide/powerlinks/realtime/app-configuration"
+								]
+							},
+							{
+								"group": "Media Upload",
+								"tag": "self-service",
+								"icon": "upload", 
+								"pages": [
+									"user-guide/powerlinks/media-upload/overview",
+									"user-guide/powerlinks/media-upload/configure-action"
+								]
+							},
+							{
+								"group": "Outbound Dialer",
+								"tag": "automated",
+								"icon": "phone-plus", 
+								"pages": [
+									"user-guide/powerlinks/telephony-outbound/overview",
+									"user-guide/powerlinks/telephony-outbound/assign-agent"
+								]
+							},
+							{
+								"group": "Master Mind",
+								"tag": "automated",
+								"icon": "brain", 
+								"pages": [
+									"user-guide/powerlinks/mastermind/overview",
+									"user-guide/powerlinks/mastermind/assign-agent",
+									"user-guide/powerlinks/mastermind/instructions",
+									"user-guide/powerlinks/mastermind/assign-sources-and-tools"
+								]
+							},
+							{
+								"group": "Rec. Review",
+								"tag": "automated",
+								"icon": "headphones", 
+								"pages": [
+									"user-guide/powerlinks/recording-review/overview",
+									"user-guide/powerlinks/recording-review/assign-agent",
+									"user-guide/powerlinks/recording-review/instructions",
+									"user-guide/powerlinks/recording-review/assign-sources-and-tools"
+								]
+							}
+						]
+					},
+					
+					{
+						"group": "🛠 Sources & Tools",
+						"pages": [
+							"user-guide/tools-sources/define-sources",
+							"user-guide/tools-sources/define-tools",
+							"user-guide/tools-sources/define-mcp-tools"
+						]
+					},
+					{
+						"group": "🎯 Workflows",
+						"pages": [
+							"user-guide/workflows/create-workflow",
+							"user-guide/workflows/design-studio",
+							"user-guide/workflows/configure-workflow"
+						]
+					},
+					{
+						"group": "💼 Jobs & Tasks",
+						"pages": [
+							"user-guide/jobs/create-manage-jobs",
+							"user-guide/jobs/connect-handle-tasks"
+						]
+					},
+					{
+						"group": "📊 Monitoring",
+						"pages": [
+							"user-guide/monitoring/job-status-output",
+							"user-guide/monitoring/task-status-output"
+						]
+					},
+					{
+						"group": "🏢 Organization Settings",
+						"pages": [
+							"user-guide/settings/organization-profile",
+							"user-guide/settings/branding"
+						]
+					}
+				]
+			}
+		]
+	},
+	"logo": {
+		"light": "/logo/light.png",
+		"dark": "/logo/dark.png"
+	},
+	"navbar": {
+		"links": [
+			{
+				"label": "Support",
+				"href": "mailto:support@agentixhub.ai"
+			}
+		],
+		"primary": {
+			"type": "button",
+			"label": "cPanel",
+			"href": "https://launch.agentixhub.ai/cpanel"
+		}
+	},
+	"footer": {
+  "socials": {
+    "x": "https://example.com/x",
+    "github": "https://example.com/github",
+    "linkedin": "https://example.com/linkedin"
   }
+}
 }

@@ -1,0 +1,100 @@
+---
+title: 'Campaign Setup'
+description: 'Create and configure outbound calling campaigns'
+icon: 'rocket'
+---
+
+# Campaign Setup
+
+Create and manage automated outbound calling campaigns with AI-powered conversation handling.
+
+## Campaign Configuration
+
+### Basic Settings
+
+<Note>
+All campaigns require a name, description and target audience definition.
+</Note>
+
+```json
+{
+  "name": "Lead Follow-up Campaign",
+  "description": "Automated follow-up calls for new leads",
+  "priority": "high",
+  "timezone": "America/New_York",
+  "callWindow": {
+    "start": "09:00",
+    "end": "17:00"
+  }
+}
+```
+
+### Contact Management
+
+<CardGroup cols={2}>
+  <Card title="Import Contacts" icon="upload">
+    Upload CSV files or sync from CRM systems
+  </Card>
+  <Card title="Contact Filtering" icon="filter">
+    Apply rules to target specific segments
+  </Card>
+  <Card title="Do Not Call Lists" icon="ban">
+    Respect opt-out preferences and regulations
+  </Card>
+  <Card title="Contact Scoring" icon="star">
+    Prioritize calls based on lead scores
+  </Card>
+</CardGroup>
+
+## Call Scripts and AI Configuration
+
+### Conversation Design
+
+1. **Opening Script**: Define how calls begin
+2. **Response Handling**: Configure AI responses to common objections
+3. **Qualification Questions**: Set up information gathering
+4. **Closing Actions**: Define call completion scenarios
+
+### Voice Settings
+
+<Tabs>
+  <Tab title="Voice Selection">
+    Choose from available AI voices with different tones and languages
+  </Tab>
+  <Tab title="Speaking Rate">
+    Adjust speaking speed for clarity and natural flow
+  </Tab>
+  <Tab title="Pause Handling">
+    Configure how the AI handles silence and interruptions
+  </Tab>
+</Tabs>
+
+## Scheduling and Execution
+
+### Campaign Timing
+
+- **Immediate Launch**: Start calling right away
+- **Scheduled Start**: Begin at a specific date and time
+- **Recurring Campaigns**: Set up repeating call schedules
+- **Time Zone Awareness**: Respect contact local times
+
+### Call Limits and Throttling
+
+```yaml
+dailyCallLimit: 1000
+maxSimultaneousCalls: 50
+retryAttempts: 3
+retryInterval: "2 hours"
+```
+
+## Compliance and Regulations
+
+<Warning>
+Ensure your campaigns comply with local telemarketing laws and regulations.
+</Warning>
+
+- TCPA compliance (US)
+- Do Not Call registry respect
+- Consent management
+- Call recording notifications
+- Opt-out handling

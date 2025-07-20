@@ -1,0 +1,44 @@
+---
+title: 'Actions'
+description: 'The smallest configurable step in a workflow'
+icon: 'puzzle-piece'
+---
+
+## Definition
+**Actions** are the smallest configurable units of a customer journey in Agentix. Each Action represents a specific **step** in the flow and is tied to a **PowerLink**.
+
+Think of an Action as a **configured instance** of a PowerLink, enriched with the logic, agents, prompts and conditions needed for execution.
+
+## What an Action Includes
+
+Each Action can be configured with:
+
+- 👤 **Performer** – Who executes the step: AI agent, human agent or customer  
+- 🛠️ **Tools & Sources** – APIs, file processors and knowledge bases used for processing or decision making  
+- 🧠 **Instruction Prompt** – Custom prompt that guides how the AI should behave during execution  
+
+Actions are placed inside **Workflows** and they’re what actually get executed during a job.
+
+![Agentix Action](/user-guide/images/configure-action.png "Agentix Action")
+*A sample overview of action configurations.*
+
+<Note>
+*In addition to assigning AI-Agent, configuring instructions, sources and tools, user have several agent and application configurations available based on the selected agent and powerlink*
+</Note>
+
+## Example Use Cases
+
+- A **Realtime Action** using an AI agent to answer questions via voice  
+- A **Media Upload Action** that requests the user to submit a file for analysis  
+- A **MasterMind Action** that routes the journey based on submitted form data  
+
+## Why Actions Matter
+
+Actions bring PowerLinks to life inside workflows. They:
+
+- Define **who does what**, **when** and **how**  
+- Provide full **control and customization** at every step  
+- Allow you to design **tailored instruction prompts** for AI agents  
+- Make workflows **modular, scalable and easy to iterate**  
+
+In short, **Actions are the execution logic** of your PowerLinks within a workflow.

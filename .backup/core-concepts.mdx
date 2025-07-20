@@ -1,0 +1,191 @@
+---
+title: 'Core Concepts'
+description: 'Understanding key concepts in Agentix'
+---
+
+These foundational building blocks explain how Agentix structures and powers intelligent customer journeys—from modular flows to AI agents and real-time task execution.
+
+---
+
+## ⚡ PowerLinks
+
+**PowerLinks** are reusable, modular building blocks that define how users interact with your service—whether through **self-service**, **guided** or **automated** flows.
+
+Each PowerLink focuses on a specific type of interaction—like media uploads, live support, outbound campaigns and more. You can assign tools, agents and custom logic to control what happens inside each one.
+
+### Characteristics
+PowerLinks are:
+
+- 🔌 **Reusable** – Designed to be plugged into different workflows without rewriting logic  
+- 🧩 **Composable** – Can be combined to form complete, multi-step customer journeys  
+- 🧠 **Dynamic** – Can work with AI, human agents or the user directly  
+- 🎯 **Purposeful** – Each PowerLink has a clearly defined function and input/output behavior  
+
+### Types
+
+Agentix offers three main types of PowerLinks:
+
+- **🧍 Self-Service** – Interactions performed directly by the customer, such as uploading documents or submitting a form  
+- **🤖 Automated** – Actions handled entirely by the system or an AI agent without human involvement  
+- **👥 Guided** – Steps where a human or AI agent guides or assists the customer through the interaction  
+
+You can mix and match PowerLinks of any type to create powerful, seamless experiences.
+
+> 👉 See [PowerLinks Catalog](/user-guide/powerlinks/catalogue) to explore available types.
+
+---
+
+## 🧩 Actions
+
+**Actions** are the smallest configurable units of a customer journey. Each Action represents a **step** in the flow and is tied to a specific **PowerLink**.
+
+You can think of an Action as an **instance of a PowerLink**—fully configured with:
+- The **agent** (AI, human or customer) responsible for execution  
+- The **input or output** required (form, document, audio, etc.)  
+- The **tool or source** used for processing or guidance  
+- The **instruction prompt** to guide AI behavior (if executed by an AI agent)  
+- The **next step** in the journey after completion  
+
+Actions are placed inside **Workflows**, where they become the actual steps customers, AI or agents interact with.
+
+### Example Use Cases
+
+- An Action using the **Realtime** PowerLink with an AI agent to answer questions  
+- A **Media Upload** Action that asks the customer to submit a document  
+- A **MasterMind** Action that calls an AI to make a routing decision based on form data  
+
+### Why Actions Matter
+
+- They define **who does what**, **when** and **how**  
+- They give you full **control and flexibility** over each step  
+- They enable tailored **instruction prompts** for precise AI behavior  
+- They make journeys modular and easy to iterate on  
+
+In short, **Actions bring PowerLinks to life** inside your workflows.
+
+---
+
+## 🤖 Agents
+
+In Agentix, **Agents** refer specifically to **AI-powered assistants** that handle various parts of a customer journey. They are assigned to specific **Actions** and operate based on system prompts, contextual data and available tools.
+
+Agents automate complex tasks, guide users, trigger tools and ensure consistent-intelligent interaction across different channels.
+
+### What AI Agents Can Do
+
+- 🧠 **Follow Prompts** – Execute structured instructions defined per action or use case  
+- 🧰 **Invoke Tools** – Trigger APIs, file processors, lookups and other tools to complete tasks  
+- 📚 **Use Knowledge Sources** – Reference documents and knowledge bases for dynamic answers  
+- 🗣️ **Multimodal** – Support chat, voice, video, forms and documents depending on the PowerLink  
+
+---
+
+### Types of Agents
+
+Agentix supports **two types of AI Agents**, each suited for a different interaction style:
+
+#### 📄 Task Agents
+
+- Handle **asynchronous**, one-time actions (e.g. form handling, file review, document extraction)  
+- Operate **in the background** with no real-time session  
+- Return output once the task is complete  
+
+#### 🎙️ Realtime Agents
+
+- Join **live sessions** via **voice**, **chat** or **video**  
+- Continuously **listen, respond and act** during the session  
+- Can **show images**, **ask for file uploads** and **collect form inputs** in real time  
+- Ideal for **conversational guidance**, **interactive workflows** and **visual assistance**
+
+> Both types share the same configuration model, but differ in execution mode and communication channel.
+
+---
+
+### 📦 Agents Are Bundled with PowerLinks
+
+Each **PowerLink** comes with one or more **predefined AI agents** tailored to its function.
+
+- For example, the **Realtime PowerLink** comes with a prebuilt **Realtime Agent** ready for voice or chat.
+- The **Media Upload PowerLink** includes a **Task Agent** that automatically analyzes submitted content.
+- These agents are fully configurable—you can customize their behavior, prompts, tools and knowledge access per use case.
+
+This modular design allows you to plug-and-play AI behavior without rebuilding from scratch.
+
+---
+
+### 🧩 Types of Agents
+
+Agentix supports **two types of AI Agents**, each suited for a different interaction style:
+
+#### 📄 Task Agents
+
+- Handle **asynchronous**, one-time actions (e.g. form handling, file review, document extraction)  
+- Operate **in the background** with no real-time session  
+- Return output once the task is complete  
+
+#### 🎙️ Realtime Agents
+
+- Join **live sessions** (voice or chat) and interact with users in real time  
+- Continuously listen, respond and take action during the session  
+- Suitable for conversational guidance, live support or interactive flows  
+
+> 🔁 Both types share the same configuration model, but differ in execution mode and communication channel.
+
+---
+
+## 🎯 Workflows
+
+Workflows define the **logic and flow** of a full customer journey.
+
+A workflow determines:
+
+- When to trigger PowerLinks and which Action to run  
+- How data moves between steps  
+- Escalation rules, branching conditions, fallback handling  
+- Completion criteria and follow-up behavior  
+
+Workflows are visualized and built using the **Workflow Designer**—a no-code drag-and-drop interface.
+
+---
+
+## �️ Tools & Sources
+
+External helpers and integrations that enrich or support the flow:
+
+- **Tools** – API calls, file processors, form handlers or custom logic runners  
+- **Sources** – Connected knowledge bases or documents the AI can use to answer questions  
+- **MCP Tools** – Model Context Protocol services you can define and plug into flows for contextual AI behavior  
+
+These resources can be assigned to AI agents and used within Actions.
+
+---
+
+## � Jobs & Tasks
+
+A **Job** represents one full execution of a workflow for a specific user or case.
+
+Jobs:
+
+- Contain all the data collected during the journey  
+- Track the full state of the process  
+- Can include both automated and manual steps  
+- Are assigned to one or more agents depending on the journey design  
+
+Each job has a unique key and full execution history.
+
+### ✅ Tasks
+
+A **Task** is a specific action within a Job that requires someone (AI or human) to do something.
+
+- Created automatically based on the Workflow and Actions  
+- Assigned to an agent or user for execution  
+- Can involve form input, validation, document uploads, voice or chat sessions  
+- Completed steps move the Job forward  
+
+Tasks are the **micro-units** of work inside a journey.
+
+---
+
+You can later consider adding a visual to show:  
+`Workflow → PowerLinks → Actions → Jobs → Tasks`  
+to illustrate how all concepts connect.

@@ -1,0 +1,201 @@
+---
+title: 'Analysis Configuration'
+description: 'Configure AI analysis settings for recording review'
+icon: 'sliders'
+---
+
+# Analysis Configuration
+
+Configure the AI-powered analysis settings for recording review to meet your specific quality assurance and compliance requirements.
+
+## Transcription Settings
+
+### Speech Recognition
+
+<CardGroup cols={2}>
+  <Card title="Language Models" icon="globe">
+    Support for multiple languages and dialects
+  </Card>
+  <Card title="Speaker Identification" icon="users">
+    Automatic detection and labeling of different speakers
+  </Card>
+  <Card title="Custom Vocabulary" icon="book">
+    Industry-specific terms and company jargon
+  </Card>
+  <Card title="Noise Filtering" icon="volume-off">
+    Background noise reduction and clarity enhancement
+  </Card>
+</CardGroup>
+
+### Accuracy Optimization
+
+```json
+{
+  "transcription_config": {
+    "language": "en-US",
+    "enable_speaker_diarization": true,
+    "enable_automatic_punctuation": true,
+    "enable_word_confidence": true,
+    "custom_vocabulary": [
+      "product_names",
+      "company_terms",
+      "technical_jargon"
+    ]
+  }
+}
+```
+
+## Quality Assessment Criteria
+
+### Scoring Parameters
+
+<Tabs>
+  <Tab title="Communication Skills">
+    - Clarity and articulation
+    - Professional language use
+    - Active listening indicators
+    - Rapport building
+  </Tab>
+  <Tab title="Process Adherence">
+    - Script compliance
+    - Required disclosures
+    - Procedure following
+    - Documentation accuracy
+  </Tab>
+  <Tab title="Outcome Achievement">
+    - Goal completion
+    - Customer satisfaction
+    - Issue resolution
+    - Next steps clarity
+  </Tab>
+</Tabs>
+
+### Custom Scoring Rules
+
+Define specific criteria for your organization:
+
+```yaml
+scoring_criteria:
+  greeting_quality:
+    weight: 10
+    required_elements:
+      - company_name_mention
+      - agent_introduction
+      - purpose_statement
+    
+  compliance_check:
+    weight: 25
+    required_disclosures:
+      - privacy_notice
+      - recording_notification
+      - terms_agreement
+    
+  customer_satisfaction:
+    weight: 20
+    indicators:
+      - positive_sentiment
+      - issue_resolution
+      - follow_up_offer
+```
+
+## Sentiment and Emotion Analysis
+
+### Real-time Monitoring
+
+<Note>
+Sentiment analysis provides insights into customer emotions throughout the conversation.
+</Note>
+
+<AccordionGroup>
+  <Accordion title="Emotion Detection">
+    Track happiness, frustration, confusion, satisfaction and other emotional states
+  </Accordion>
+  <Accordion title="Sentiment Trends">
+    Monitor how sentiment changes throughout the conversation
+  </Accordion>
+  <Accordion title="Critical Moments">
+    Identify key points where sentiment shifts significantly
+  </Accordion>
+  <Accordion title="Recovery Tracking">
+    Measure how well agents handle negative situations
+  </Accordion>
+</AccordionGroup>
+
+## Compliance Monitoring
+
+### Regulatory Requirements
+
+Configure monitoring for industry-specific regulations:
+
+- **Financial Services**: FINRA, SEC compliance
+- **Healthcare**: HIPAA privacy requirements
+- **Telecommunications**: TCPA regulations
+- **General**: GDPR, data protection laws
+
+### Alert Configuration
+
+Set up automated alerts for compliance violations:
+
+```json
+{
+  "compliance_alerts": {
+    "missing_disclosure": {
+      "severity": "high",
+      "notification": "immediate",
+      "escalation": "supervisor"
+    },
+    "inappropriate_language": {
+      "severity": "medium",
+      "notification": "end_of_call",
+      "escalation": "team_lead"
+    }
+  }
+}
+```
+
+## Custom Keywords and Phrases
+
+### Positive Indicators
+
+Track phrases that indicate successful interactions:
+- "Thank you for your help"
+- "That makes sense"
+- "I'm satisfied with the solution"
+- "You've been very helpful"
+
+### Negative Indicators
+
+Monitor for phrases that suggest problems:
+- "I want to speak to a manager"
+- "This is unacceptable"
+- "I'm going to cancel"
+- "You don't understand"
+
+### Compliance Keywords
+
+<Warning>
+Ensure all required compliance terms and disclosures are properly detected and flagged.
+</Warning>
+
+- Regulatory disclosures
+- Privacy statements
+- Terms and conditions
+- Consent confirmations
+
+## Reporting and Analytics
+
+### Dashboard Configuration
+
+Customize your analysis dashboard:
+
+1. **Key Performance Indicators**: Define the metrics that matter most
+2. **Trend Analysis**: Track performance over time
+3. **Comparative Analysis**: Compare agents, teams or time periods
+4. **Drill-down Capabilities**: Deep dive into specific conversations
+
+### Export Options
+
+- Detailed transcripts with analysis
+- Summary reports and scorecards
+- Raw data for external analysis
+- API access for custom integrations
