@@ -1,0 +1,483 @@
+---
+title: 'Realtime'
+description: 'Launch real-time interactions with AI or human agents'
+icon: 'microphone'
+iconType: 'duotone'
+tag: 'guided'
+---
+
+<div style={{
+  border: '1px solid #6366f1',
+  borderRadius: '6px',
+  padding: '8px 12px',
+  fontSize: '0.85rem',
+  backgroundColor: 'rgba(99, 102, 241, 0.05)',
+}}>
+  <div className="badge-guided">guided</div>
+  <div>
+    This PowerLink runs in guided mode — it launches a real-time session with a human or AI agent.
+  </div>
+</div>
+
+The **Realtime** PowerLink launches a **live audio, video or chat session** between the customer and an agent. It supports AI agents (via LiveKit) or human agents from your workforce. You can customize language, input identity and session behavior before starting the interaction.
+
+## Key Features
+
+<CardGroup cols={2}>
+  <Card title="🎙️ Live Audio or Video">
+    Launch real-time calls powered by LiveKit (AI or human).
+  </Card>
+  <Card title="🤖 Supports AI Agents">
+    Use AI agents to handle live sessions with integrated STT/LLM.
+  </Card>
+  <Card title="📞 Human Agent Routing">
+    Connect the session to a waiting human agent (optional).
+  </Card>
+  <Card title="🌍 Language & Identity Control">
+    Configure language, identity and session metadata dynamically.
+  </Card>
+</CardGroup>
+
+## How to Install
+
+Go to the **Store** tab in Agentix cPanel, find **Realtime** and click **Install** to add it to your PowerLinks list.
+
+<img src="/user-guide/images/catalogue-realtime.png" alt="Catalogue snapshot" className='rounded-xl my-6 shadow' width={250}/>
+
+## How it Works
+
+When this PowerLink is triggered, it prepares session metadata, configures connection identity and launches a live session with either an AI agent (default) or a routed human agent. The session can include audio, video or chat and runs on LiveKit infrastructure.
+
+<Check>
+You can control the launch behavior using input parameters like `LANGUAGE`, `CALL_TYPE` or `TELEPHONY_WEB_PANEL_IDENTITY`. The session is launched immediately after the task starts.
+</Check>
+
+<Note>
+This PowerLink is meant to be triggered from LaunchPad or via API. It's ideal for workflows where customer input must be handled **live** in real time.
+</Note>
+
+
+## How it Looks for Customers
+
+This is how the real-time session interface appears to customers when triggered by a LaunchPad or invitation link. The layout works across desktop and mobile, providing an intuitive experience for video or audio interactions.
+
+<img src="/user-guide/images/realtime-customer.png" alt="Customer view of Realtime Agent" className="rounded-md my-6 shadow" />
+
+### Key Interface Components
+
+- **Left Panel (Customer View):**  
+  Displays the customer’s avatar or video feed (if camera is enabled). The name and language are shown at the bottom left.
+
+- **Right Panel (Agent View):**  
+  Shows the AI or human agent. When using AI, the agent displays a branding visual along with transcribed responses as subtitles.
+
+- **Bottom Toolbar:**  
+  Customers can mute/unmute their microphone, turn camera on/off, share screen, open chat, adjust settings or leave the session.
+
+<Check>
+The AI or human agent handles the entire conversation. No manual submission or rejection is required from the customer side.
+</Check>
+
+<Info>
+Sessions may be voice-only or video-enabled depending on your workflow configuration and assigned agent capabilities.
+</Info>
+
+<Info>
+This interface also supports multiparty conferences. When additional participants join, the layout automatically adjusts to accommodate them.
+</Info>
+
+## Configuration Parameters
+These parameters control the behavior of the Realtime PowerLink at the **PowerLink level**, such as call recording, pre-join prompts and outbound dialer settings.
+
+<Expandable title="Configuration Parameters">
+
+  <ParamField path="USER_PROMPT" type="TEXT" default="Welcome to the video call. You may click on join to enter call room.">
+  Disclaimer text to display prior to joining the call. Supports basic HTML.
+  </ParamField>
+
+  <ParamField path="GUEST_INVITE" type="LIST" default="ON">
+  Allow users to generate invitation links for guest users.
+  </ParamField>
+
+  | Value | Description |
+  |-------|-------------|
+  | `ON`  | Enable guest invitation link |
+  | `OFF` | Disable guest invitation link |
+
+  <ParamField path="RECORDER" type="LIST" default="OFF">
+  Enable or disable recording of the call session.
+  </ParamField>
+  | Value | Description |
+  |-------|-------------|
+  | `ON`  | Enable call recording |
+  | `OFF` | Disable call recording |
+
+  <ParamField path="RECORDER_LAYOUT" type="LIST" default="grid">
+  Specify the layout for recorded output.
+  </ParamField>
+
+
+  | Value     | Description                        |
+  |-----------|------------------------------------|
+  | `grid`    | All participants shown equally     |
+  | `speaker` | Focuses on the active speaker      |
+  | `single`  | Only one participant shown at once |
+
+
+  <ParamField path="ALLOWED_TASK_ACTIONS" type="MULTI">
+  Select which task actions to show or hide for the user (not the customer). The selected actions will appear in the user’s task actions menu.
+  </ParamField>
+
+
+  | Task Action                | Description                                  |
+  |---------------------------|----------------------------------------------|
+  | `getUserLocation`         | Requests the user's geolocation              |
+  | `mediaUpload:Personal ID` | Upload of a personal identification document |
+  | `mediaUpload:Passport`    | Upload of passport image                     |
+  | `mediaUpload:Selfie`      | Capture and upload of a selfie               |
+  | `mediaUpload:Utiltiy Bill`| Upload of a utility bill                     |
+  | `mediaUpload`             | General media upload (image or document)     |
+
+  <ParamField path="SOURCE_LANGUAGE" type="MULTI" default="en-US">
+  List of languages supported in the session. Displayed to the user during pre-join. Default language is always the first one in the list order.
+  </ParamField>
+  <Note>
+  You can add any language locale later and select it in the agent assignement.
+  </Note>
+
+  <ParamField path="START_MODE" type="LIST" default="audio-video">
+  Specifies the initial mode for the session.
+  </ParamField>
+
+  | Mode | Description |
+  |------|-------------|
+  | `audio-video` | Start with audio/video |
+  | `chat` | Start with chat only |
+
+  <ParamField path="HIDE_LOCAL_TITLE" type="LIST" default="OFF">
+  Hide or show the local participant's title in the call interface.
+  </ParamField>
+
+  | Value | Description            |
+  |-------|------------------------|
+  | `ON`  | Hide local participant title |
+  | `OFF` | Show local participant title |
+
+  <ParamField path="OUTBOUND_TRUNK_CONFIG" type="TEXT">
+  Trunk configuration for outbound dialer agent. Use this format:  
+  `{ TRUNK_NAME=telnyx-outbound-trunk, SIP_ADDRESS=sip.telnyx.com, AUTH_USERNAME=username, AUTH_PASSWORD=password }`
+  </ParamField>
+
+  <ParamField path="OUTGOING_CALLING_NUMBER" type="TEXT">
+  Phone number to use for outbound calls.
+  </ParamField>
+
+</Expandable>
+
+
+## Agents
+  Here is list of available agents that can be used with this PowerLink. Each agent has its own set of parameters that can be configured to suit your use-case.
+  
+  <Card horizontal >
+    <div id="agent-multimodal" className="flex items-center gap-4">
+      <div className="w-20 h-auto flex-shrink-0">
+        <img
+          src="/user-guide/images/agent-multimodal.png"
+          alt="Multimodal Realtime Agent"
+          className="rounded-sm w-full h-full object-contain m-0"
+        />
+      </div>
+      <div>
+        <strong className="text-lg">Multimodal Realtime Agent</strong><br />
+        AI Agent for video/audio calls using multimodal realtime LLMs (OpenAI GPT or Google Gemini) that support audio input and output in real time.
+      </div>
+    </div>
+
+    <Expandable title="Agent Parameters">
+
+      <ParamField path="LLM" type="LIST" default="openai:gpt-4o-mini-realtime-preview">
+      Select the LLM provider and model for the assistant.
+      </ParamField>
+
+      | Provider | Model |
+      |----------|-------|
+      | OpenAI | `gpt-4o-mini-realtime-preview-2024-12-17` |
+      | OpenAI | `gpt-4o-realtime-preview-2024-12-17` |
+      | Google | `gemini-2.0-flash-exp` |
+      | Google | `gemini-2.5-flash-preview-native-audio-dialog` |
+
+      <ParamField path="TEMPERATURE" type="TEXT" default="0.8">
+      0-1 Default 0.8 (Minimum allowed temperature = 0.6)
+      </ParamField>
+
+      <ParamField path="VOICE" type="LIST" default="openai:alloy">
+      Select the voice for the assistant.
+      </ParamField>
+
+      | Provider | Voice Options |
+      |----------|---------------|
+      | OpenAI | `alloy`, `ash`, `ballad`, `coral`, `echo`, `sage`, `shimmer`, `verse` |
+      | Google | `Puck`, `Charon`, `Kore`, `Fenrir`, `Aoede`, `Leda`, `Orus`, `Zephyr` |
+
+      <ParamField path="PRONUNCIATIONS" type="TEXT">
+      Add Custom pronunciations rules for names and terms. Use multi-line with trailing semicolon for each entry.
+      Format: `language_code|name=pronunciation;`
+      </ParamField>
+
+      <ParamField path="USER_RESPONSE_TIMEOUT" type="TEXT" default="30">
+      Timeout for user response in seconds.
+      </ParamField>
+
+      <ParamField path="HANDOFF" type="LIST" default="OFF">
+      Select the handoff provider for the assistant. Disable by selecting OFF.
+      </ParamField>
+
+      <ParamField path="AVATAR" type="LIST" default="OFF">
+      Select the avatar for the assistant. Select OFF to disable avatar or select provider with its related parameters.
+      </ParamField>
+
+      | Avatar | Description |
+      |--------|-------------|
+      | OFF | No avatar |
+      | Sandra | `tavus:name=Sandra` |
+      | Steph | `tavus:name=Steph` |
+      | James | `tavus:name=James` |
+      </Expandable>
+  </Card>
+
+  <Card horizontal>
+
+    <div id='agent-voicepipeline' className="flex items-center gap-4">
+      <div className="w-20 h-auto flex-shrink-0">
+        <img
+          src="/user-guide/images/agent-voicepipeline.png"
+          alt="Voice Pipeline Agent"
+          className="rounded-sm w-full h-full object-contain m-0"
+        />
+      </div>
+      <div>
+        <strong className="text-lg">Voice Pipeline Realtime Agent</strong><br />
+        AI Agent for video/audio calls using a voice pipeline supporting different providers — voice activity detection, speech-to-text (STT), LLM processing and text-to-speech (TTS).
+      </div>
+    </div>
+
+    <Expandable title="Agent Parameters">
+
+      <ParamField path="STT" type="LIST" default="gladia">
+      Select the STT (Speech-to-Text) provider for the assistant.
+      </ParamField>
+
+      | Provider | Options |
+      |----------|---------|
+      | Gladia | `gladia` |
+      | OpenAI | `whisper-1`, `gpt-4o-mini-transcribe` |
+      | Groq | `whisper-large-v3`, `whisper-large-v3-turbo` |
+      | Deepgram | `nova-2`, `nova-3` |
+
+      <ParamField path="LLM" type="LIST" default="openai:gpt-4o-mini">
+      Select the LLM provider and model for the assistant.
+      </ParamField>
+
+      <ParamField path="TTS" type="LIST" default="openai:gpt-4o-mini-tts">
+      Select the TTS (Text-to-Speech) provider for the assistant.
+      </ParamField>
+
+      | Provider | Options |
+      |----------|---------|
+      | OpenAI | `tts-1`, `gpt-4o-mini-tts`, `tts-1-hd` |
+      | ElevenLabs | `eleven_turbo_v2_5`, `eleven_multilingual_v2` |
+      | Azure | `Azure` |
+
+      <ParamField path="VOICE" type="LIST" default="openai:alloy">
+      Select the voice for the assistant.
+      </ParamField>
+
+      <ParamField path="ALLOW_OPENING_INTERRUPT" type="LIST" default="ON">
+      Allow user to interrupt the opening welcome prompt.
+      </ParamField>
+
+      <ParamField path="USER_RESPONSE_TIMEOUT" type="TEXT" default="30">
+      Timeout for user response in seconds.
+      </ParamField>
+    </Expandable>
+  </Card>
+
+  <Card horizontal>
+
+  <div id='agent-chat' className="flex items-center gap-4">
+    <div className="w-20 h-auto flex-shrink-0">
+      <img
+        src="/user-guide/images/agent-chat.png"
+        alt="Chat Agent"
+        className="rounded-sm w-full h-full object-contain m-0"
+      />
+    </div>
+    <div>
+      <strong className="text-lg">Chat Realtime Agent</strong><br />
+      AI Realtime Chat Assistant for text-based conversations, supporting different LLM text-to-text providers.
+    </div>
+  </div>
+
+  <Expandable title="Agent Parameters">
+
+    <ParamField path="LLM" type="LIST" default="openai:gpt-4o-mini">
+    Select the LLM provider and model for the assistant.
+    </ParamField>
+
+    | Provider | Model |
+    |----------|-------|
+    | OpenAI | `gpt-4o-mini`, `gpt-4o` |
+    | Groq | `llama-3.3-70b-versatile`, `deepseek-r1-distill-llama-70b` |
+
+    <ParamField path="USER_RESPONSE_TIMEOUT" type="TEXT" default="30">
+    Timeout for user response in seconds.
+    </ParamField>
+
+    <ParamField path="MAX_REMINDERS" type="TEXT" default="3">
+    Maximum number of reminders to send to the user before considering hangup.
+    </ParamField>
+
+    <ParamField path="HANDOFF" type="LIST" default="OFF">
+    Select the handoff provider for the assistant.
+    </ParamField>
+
+    <ParamField path="THINKING_SOUND" type="MULTI" default="KEYBOARD_TYPING,KEYBOARD_TYPING2">
+    Select sound to play while in thinking state.
+    </ParamField>
+
+    | Sound Option | Description |
+    |--------------|-------------|
+    | KEYBOARD_TYPING | Standard typing sound |
+    | KEYBOARD_TYPING2 | Alternative typing sound |
+    | bell.ogg | Bell notification |
+    | screenshot.ogg | Screenshot sound |
+  </Expandable>
+  </Card>
+
+  <Card horizontal>
+
+    <div id='agent-liveassist' className="flex items-center gap-4">
+      <div className="w-20 h-auto flex-shrink-0">
+        <img
+          src="/user-guide/images/agent-liveassist.png"
+          alt="Live Assist Agent"
+          className="rounded-sm w-full h-full object-contain m-0"
+        />
+      </div>
+      <div>
+        <strong className="text-lg">Live Assist Realtime Agent</strong><br />
+        AI Agent for video/audio calls. Silently listens to the customer and sends real-time text suggestions to the human agent on how to respond or answer user questions.
+      </div>
+    </div>
+
+    <Expandable title="Agent Parameters">
+
+      <ParamField path="HANDOFF_PROVIDER" type="LIST" default="OFF">
+      Select the handoff provider for the assistant.
+      </ParamField>
+
+      <ParamField path="STT" type="LIST" default="OFF">
+      Select the STT provider for the assistant. Disable by selecting OFF.
+      </ParamField>
+
+      | Provider | Options |
+      |----------|---------|
+      | OFF | Disabled |
+      | OpenAI | `whisper-1`, `gpt-4o-mini-transcribe` |
+      | Azure | `Azure` |
+
+      <ParamField path="LLM" type="LIST" default="OFF">
+      Select the LLM provider and model for the assistant.
+      </ParamField>
+
+      <ParamField path="SYSTEM_INSTRUCTIONS" type="TEXT" format="MARKDOWN" default="Your are a live assist agent. You should monitor the call and assist the agent when needed.">
+      System instructions for the assistant.
+      </ParamField>
+
+      <ParamField path="TURN_DETECTOR_CONFIG" type="TEXT" default="activation_threshold_ms=700,prefix_padding_duration_ms=500,min_silence_duration_ms=1000,min_speech_duration_ms=800,advanced_vp_turn_detector=ON">
+      Turn Detector Configuration settings.
+      </ParamField>
+    </Expandable>
+  </Card>
+
+  <Card horizontal>
+
+    <div id='agent-translation' className="flex items-center gap-4">
+      <div className="w-20 h-auto flex-shrink-0">
+        <img
+          src="/user-guide/images/agent-live-translation.png"
+          alt="Speech Translation Agent"
+          className="rounded-sm w-full h-full object-contain m-0"
+        />
+      </div>
+      <div>
+        <strong className="text-lg">Speech Live Translation Agent</strong><br />
+        AI Agent for video/audio calls that transcribes and translates speech in real time using Azure Cognitive Speech Services.
+      </div>
+    </div>
+
+
+    <Expandable title="Agent Parameters">
+      <ParamField path="TARGET_LANGUAGE" type="MULTI" default="en">
+      Multi selection of target language. If empty, speech recognizer will work in Auto Mode. Must be specified for translation.
+      </ParamField>
+
+      | Language | Code |
+      |----------|------|
+      | Arabic | `ar` |
+      | English | `en` |
+      | French | `fr` |
+      | Bengali | `bn` |
+      | German | `de` |
+
+      <Note>
+      It is recommended to use source language to have faster results for Transcription and translation.
+      </Note>
+    </Expandable>
+
+  </Card>
+
+
+## Use Cases
+
+- Real-time sales or support assistance
+- Interactive document review and guidance
+- Video KYC, onboarding or ID verification
+- On-demand call handling from LaunchPad or web forms
+- AI agent-driven real-time surveys and lead capture
+
+## Getting Started
+
+<Steps>
+
+<Step title="Create Action from Realtime PowerLink">
+After installing the PowerLink, go to **PowerLinks** in your cPanel, select **Actions** and click **Create New Action** using this PowerLink.
+</Step>
+
+<Step title="Assign Agent to Action">
+After creating the action, assign the appropriate **Agent** to handle the real-time task associated with this PowerLink.
+</Step>
+
+<Step title="Configure PowerLink Action Parameters">
+Set up the action’s configuration parameters such as `SOURCE_LANGUAGE` or `USER_PROMPT`, depending on your expected usage scenario.
+<img src="/user-guide/images/realtime-config.png" alt="Configure Realtime PowerLink" className="rounded-lg"/>
+
+</Step>
+
+<Step title="Configure Agent Instructions, Sources and Tools">
+Define the instructions, knowledge sources and function tools required by the assigned agent to handle the conversation effectively.
+<img src="/user-guide/images/configure-action.png" alt="Configure Action" className="rounded-lg"/>
+
+</Step>
+
+<Step title="Attach to Workflow">
+Add the action to a workflow using workflow studio.
+<img src="/user-guide/images/workflow-add-action.png" alt="Attach to Workflow" className="rounded-lg"/>
+
+</Step>
+
+<Step title="Test the Live Session">
+From **LaunchPad** or Create New Job or via API trigger, initiate a live session and confirm the agent joins, responds correctly and the task flow behaves as expected.
+</Step>
+
+</Steps>

@@ -26,4 +26,34 @@
   color: #10b981 !important;
 }
 
+.badge-guided,
+.badge-self-service,
+.badge-automated {
+  display: inline-block;         /* Ensure it wraps around its content */
+  width: fit-content;            /* Prevent full width stretch */
+  padding: 2px 8px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.75rem;
+  margin-bottom: 6px;
+}
 
+/* Specific colors */
+.badge-guided {
+  background-color: rgba(20, 122, 205, 0.1);
+  color: #147acd;
+}
+
+.badge-self-service {
+  background-color: rgba(245, 158, 11, 0.1);
+  color: #f59e0b;
+}
+
+.badge-automated {
+  background-color: rgba(16, 185, 129, 0.1);
+  color: #10b981;
+}
+
+.mdx-content .card table th {
+  color: inherit;
+}

@@ -1,73 +1,118 @@
 ---
 title: 'Catalogue'
 description: 'Browse and discover available PowerLinks for your Agentix workspace'
-# icon: 'grid'
 ---
 
-# PowerLinks Catalogue
+PowerLinks are modular, ready-made building blocks you can install to extend your Agentix platform. Each PowerLink includes specs, supported agents and configuration options — tailored for different service modes like **Guided**, **Self-Service** and **Automated**.
 
-Discover and install PowerLinks to add new capabilities to your Agentix workspace.
+<img src="/user-guide/images/powerlinks-catalogue.png" alt="Catalogue Preview" className="rounded-xl my-6 shadow" />
 
-## Available PowerLinks
 
-### 🎧 Realtime
-**Guided interactions** with live AI or human agents
-- Voice and chat support
-- Real-time conversations
-- Agent handoff capabilities
-- **Use Cases**: Customer support, onboarding, consultations
+## 🔍 How to Use the Catalogue
 
-### 📁 Media Upload  
-**Self-service** file processing and analysis
-- Automated file processing
-- Multiple format support
-- No agent interaction required
-- **Use Cases**: Document analysis, image processing, form submission
+You can **browse**, **preview** and **install** PowerLinks from the cPanel sidebar under **Store → Catalogue**:
 
-### 📞 Outbound Dialer
-**Automated** outbound calling campaigns
-- AI-powered conversations
-- Lead qualification
-- Campaign management
-- **Use Cases**: Sales outreach, appointment scheduling, surveys
+1. **Open the Catalogue**
+2. **Filter or search** by type, category or keyword
+3. Click any PowerLink to explore its:
+   - 🧾 Description and use cases
+   - 🤖 Supported AI-Agents
+   - ⚙️ Configuration specs
+   - 💰 Pricing model (Quota or Concurrent)
 
-### 🧠 MasterMind
-**Automated** complex workflow orchestration
-- Multi-agent coordination
-- Advanced decision trees
-- Context awareness
-- **Use Cases**: Complex onboarding, multi-step processes, compliance workflows
 
-### 🎵 Recording Review
-**Automated** analysis of recorded interactions
-- Quality assurance
-- Compliance checking
-- Performance insights
-- **Use Cases**: Call center QA, training feedback, compliance monitoring
+## ⚙️ Installing a PowerLink
 
-## Installation Process
+To install a PowerLink:
 
-1. **Browse** the catalogue above
-2. **Learn more** by clicking on a PowerLink
-3. **Install** by clicking the install button
-4. **Configure** your PowerLink settings
-5. **Create actions** using your new PowerLink
+1. Click **Install** on the PowerLink card
+2. Review the included configuration specs and default settings
+3. Save and proceed to create **Actions** using the PowerLink
+4. Assign agents, instructions, tools and sources to each Action
 
-## PowerLink Types
+<img src="/user-guide/images/install-powerlink.png" alt="Install Process" className="rounded-xl my-6 shadow" />
 
-### Guided (🔵)
-Require human or AI agent interaction throughout the process. Best for complex situations requiring decision-making and personalized responses.
+### ✅ After Installation
 
-### Self-Service (🟠)
-Allow customers to complete tasks independently with minimal or no agent intervention. Ideal for routine processes and information gathering.
+Once installed:
+- Configure the PowerLink’s specs (language, handoff mode, etc.)
+- Create **Actions** using this PowerLink
+- Link the Actions to a **Workflow**
+- Launch and monitor Jobs using LaunchPad or QR code
 
-### Automated (🟢)  
-Fully automated processes that run in the background. Perfect for data processing, analysis and systematic tasks.
 
-## Next Steps
+## 🔄 Update the Catalogue
 
-After installing a PowerLink:
-1. Review the specific configuration options
-2. Set up any required tools and sources
-3. Create your first action
-4. Test before deploying to customers
+Use the **Update** button on the Catalogue page to sync your local store with the latest available PowerLinks from the online marketplace.
+
+This ensures you:
+- Have access to new PowerLinks added by the platform
+- Get the latest version and specs of existing PowerLinks
+- See updated agent compatibility and pricing
+
+> 💡 You can update at any time — no configurations are overwritten unless the PowerLink was previously installed.
+
+## 💡 Understanding Service Modes
+Powerlinks are avaiable with the following service-modes:
+
+<div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+  <div style={{
+    border: '1px solid #147acd',
+    borderRadius: '6px',
+    padding: '8px 12px',
+    fontSize: '0.85rem'
+  }}>
+    <div className="badge-guided">guided</div>
+    <div>Requires a human or AI agent to join and guide the interaction</div>
+  </div>
+
+  <div style={{
+    border: '1px solid #f59e0b',
+    borderRadius: '6px',
+    padding: '8px 12px',
+    fontSize: '0.85rem'
+  }}>
+    <div className="badge-self-service">self-service</div>
+    <div>Customers complete tasks on their own with no agent involvement</div>
+  </div>
+
+  <div style={{
+    border: '1px solid #10b981',
+    borderRadius: '6px',
+    padding: '8px 12px',
+    fontSize: '0.85rem'
+  }}>
+    <div className="badge-automated">automated</div>
+    <div>Runs fully in the background with no user interaction</div>
+  </div>
+</div>
+
+## 🔍 Explore Available PowerLinks
+
+  <Card title="Realtime Audio, Video and Chat" icon="microphone" href="./plk-realtime" horizontal>
+  
+    Live collaboration using voice and video with AI or human agents.
+    <br/><span className="badge-guided">guided</span>
+  </Card>
+  <Card title="Media Upload" icon="upload" href="./plk-media-upload" horizontal>
+    Let customers upload files via camera, gallery or document picker.<br/>
+    <span className="badge-self-service">self-service</span>
+  </Card>
+
+  <Card title="Recording Analyzer" icon="headphones" href="./plk-recording-review" horizontal>
+    Score and analyze call recordings for QA, compliance and coaching.
+    <br/><span className="badge-automated">automated</span>
+  </Card>
+
+  <Card title="Outbound Dialer" icon="phone-arrow-up-right" href="./plk-telephony-outbound" horizontal>
+    Run AI-powered telephony outbound calls for any action.
+    <br/><span className="badge-automated">automated</span>
+  </Card>
+  <Card title="MasterMind" icon="sparkles" href="./plk-mastermind" horizontal>
+    Automate complex decisions with AI Agents.
+    <br/><span className="badge-automated">automated</span>
+  </Card>
+
+{/* ---
+
+> 📘 Need help? Check the [Manager Quickstart Guide](/user-guide/quickstart-manager) or [Core Concepts](/introduction/core-concepts) for a deeper understanding. */}

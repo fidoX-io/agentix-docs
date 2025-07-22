@@ -11,7 +11,7 @@
 	"navigation": {
 		"tabs": [
 			{
-				"tab": "User Guide",
+				"tab": "Users Guide",
 				"groups": [
 					{
 						"group": "🚀 Getting Started",
@@ -39,61 +39,11 @@
 						"group": "⚡ PowerLinks",
 						"pages": [
 							"user-guide/powerlinks/catalogue",
-							"user-guide/powerlinks/install-powerlink",
-							{
-								"group": "Realtime",
-								"tag": "guided",
-								"icon": "microphone",
-								"pages": [
-									"user-guide/powerlinks/realtime/overview",
-									"user-guide/powerlinks/realtime/create-action",
-									"user-guide/powerlinks/realtime/assign-agent",
-									"user-guide/powerlinks/realtime/instructions",
-									"user-guide/powerlinks/realtime/sources",
-									"user-guide/powerlinks/realtime/tools",
-									"user-guide/powerlinks/realtime/app-configuration"
-								]
-							},
-							{
-								"group": "Media Upload",
-								"tag": "self-service",
-								"icon": "upload", 
-								"pages": [
-									"user-guide/powerlinks/media-upload/overview",
-									"user-guide/powerlinks/media-upload/configure-action"
-								]
-							},
-							{
-								"group": "Outbound Dialer",
-								"tag": "automated",
-								"icon": "phone-plus", 
-								"pages": [
-									"user-guide/powerlinks/telephony-outbound/overview",
-									"user-guide/powerlinks/telephony-outbound/assign-agent"
-								]
-							},
-							{
-								"group": "Master Mind",
-								"tag": "automated",
-								"icon": "brain", 
-								"pages": [
-									"user-guide/powerlinks/mastermind/overview",
-									"user-guide/powerlinks/mastermind/assign-agent",
-									"user-guide/powerlinks/mastermind/instructions",
-									"user-guide/powerlinks/mastermind/assign-sources-and-tools"
-								]
-							},
-							{
-								"group": "Rec. Review",
-								"tag": "automated",
-								"icon": "headphones", 
-								"pages": [
-									"user-guide/powerlinks/recording-review/overview",
-									"user-guide/powerlinks/recording-review/assign-agent",
-									"user-guide/powerlinks/recording-review/instructions",
-									"user-guide/powerlinks/recording-review/assign-sources-and-tools"
-								]
-							}
+							"user-guide/powerlinks/plk-realtime",
+							"user-guide/powerlinks/plk-media-upload",
+							"user-guide/powerlinks/plk-recording-review",
+							"user-guide/powerlinks/plk-telephony-outbound",
+							"user-guide/powerlinks/plk-mastermind"
 						]
 					},
 					
@@ -132,6 +82,30 @@
 						"pages": [
 							"user-guide/settings/organization-profile",
 							"user-guide/settings/branding"
+						]
+					}
+				]
+			},
+			{
+				"tab": "Developers Guide",
+				"groups": [
+					{
+						"group": "API Overview",
+						"pages": [
+							"api-reference/overview",
+							"api-reference/authentication"
+						]
+					},
+					{
+						"group": "API Reference",
+						"pages": [
+							"api-reference/endpoints/workflows",
+							"api-reference/endpoints/powerlinks",
+							"api-reference/endpoints/agents",
+							"api-reference/endpoints/sources",
+							"api-reference/endpoints/tools",
+							"api-reference/endpoints/jobs",
+							"api-reference/endpoints/tasks"
 						]
 					}
 				]
