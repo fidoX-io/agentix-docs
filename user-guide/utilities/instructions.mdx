@@ -1,0 +1,82 @@
+---
+title: 'Instructions'
+description: 'Define the system behavior and guardrails for your AI agent'
+icon: 'wand-magic-sparkles'
+---
+
+## ✨ What are Instructions?
+
+Instructions define how the AI agent should behave within the assigned action. Think of this as the **system prompt** or **guiding policy** for the agent. This includes its tone, personality, task goals, boundaries, and how to respond in different situations.
+
+Instructions are configured at the **Agent Assignment level**. Each task using that agent will follow these instructions unless overridden programmatically.
+
+
+## 🧠 Example Instruction
+
+```plaintext
+You are a helpful support assistant for our telecom customers. Answer in Egyptian Arabic. If the user asks about “5G coverage,” explain the coverage map and offer to show an image using the show_media_to_user tool. End the call politely if the user says “thank you” or “goodbye.”
+```
+
+## 🛡️ Best Practices & Guardrails
+
+<Card title="Be Clear and Concise" icon="list-check" iconType="duotone">
+Use direct language. Avoid unnecessary complexity. Make it easy for the LLM to follow.
+
+**Example:**  
+“Always greet the user first. Then ask for their product name before continuing.”
+</Card>
+
+<Card title="Define Scope and Boundaries" icon="shield-exclamation" iconType="duotone">
+Explicitly state what the agent **should NOT** do. This helps prevent hallucinations or off-topic behavior.
+
+**Example:**  
+“Do not provide pricing. Redirect the user to a human agent if asked.”
+</Card>
+
+<Card title="Set Tone and Role" icon="user-tie" iconType="duotone">
+Define tone, attitude, or even a role persona (e.g., assistant, advisor, onboarding agent).
+
+**Example:**  
+“You are a friendly onboarding specialist guiding the user through account setup.”
+</Card>
+
+<Card title="Reference Sources" icon="book-open-cover" iconType="duotone">
+Instruct the agent to use linked documents (PDFs, text, etc.) when responding.
+
+**Example:**  
+“If asked about refund policy, search the uploaded document titled ‘ReturnPolicy.pdf’.”
+</Card>
+
+<Card title="Use Tools Wisely" icon="wand-magic-sparkles" iconType="duotone">
+Agents can call tools you’ve enabled — guide them on when and how.
+
+**Example:**  
+“If the user asks to see plan details, use the `show_media_to_user` tool to display ‘plan_comparison.png’.”
+</Card>
+
+<Card title="Test with Edge Cases" icon="flask-vial" iconType="duotone">
+Before going live, test your instructions with tricky or unexpected questions.
+
+**Example:**  
+“What if the user asks something off-topic? Does the agent redirect or stall?”
+</Card>
+
+---
+
+## 🔗 Instructions + Sources + Tools = Power
+
+When combined with configured sources and tools, instructions become the true control center for your agent behavior. You can:
+
+- Tell the agent **how** and **when** to reference sources
+- Instruct the agent to **call tools** (e.g. show image, collect document)
+- Set clear rules on **conversation flow**, tone, and escalation
+
+---
+
+<Check>
+Instructions are evaluated in real time and are essential for building predictable and controlled AI agents.
+</Check>
+
+<Danger>
+Poorly written instructions may lead to hallucinations, irrelevant answers, or compliance issues. Always review and test thoroughly.
+</Danger>

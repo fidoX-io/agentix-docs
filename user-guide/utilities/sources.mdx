@@ -1,0 +1,145 @@
+---
+title: 'Sources'
+description: 'Configure and manage data sources for your agents assignment'
+icon: 'books'
+iconType: 'duotone'
+---
+
+Sources enable agents to access external data, static content, or dynamic inputs during a task. They are centrally defined and assigned to agents per action, allowing flexible access to files, records, and forms across workflows.
+
+<img src="/user-guide/images/sources.png" alt="Agentix Sources panel" className="rounded-xl shadow my-4" />
+<Info>
+Sources are globally managed and reusable across different workflows and agent assignments.
+</Info>
+
+## Types of Sources
+
+<CardGroup>
+
+<Card title="📁 Static Files" size="md" href="#static-files">
+Upload files like PDFs, images, Excel, or DOCX that can be previewed by agents or shown to users during a task.
+</Card>
+
+<Card title="📚 Knowledge Base (RAG)" size="md" href="#knowledge-base">
+Index content from files, URLs, or text and allow agents to query this data using retrieval-augmented generation (RAG).
+</Card>
+
+<Card title="📝 Forms" size="md" href="#forms">
+Define interactive HTML forms to collect user input during tasks, shown dynamically to the user by the agent.
+</Card>
+
+</CardGroup>
+
+
+
+<div id="static-files"/>
+---
+## Static Files
+
+Static files are uploaded assets that can be shown to the user or previewed by the agent as part of a task. Common file types include:
+
+- Images (PNG, JPG, etc.)
+- PDFs
+- Excel sheets
+- DOCX or text documents
+
+These files are **ready to use immediately** once uploaded.
+
+<Check>
+Static files do not require processing — they are usable as soon as they’re uploaded.
+</Check>
+
+### Example of Image - Static File Source
+
+<img src="/user-guide/images/source-static-image.png" alt="Example Static Image" className="rounded-lg shadow my-4" />
+
+
+
+<div id="knowledge-base"/>
+---
+
+## 📚 Knowledge Base (RAG) 
+
+Knowledge Base sources enable agents to perform contextual search using retrieval-augmented generation (RAG). This allows an agent to answer user questions based on:
+
+- Uploaded files (PDF, TXT)
+- Website URLs
+- Raw pasted text
+
+Each knowledge source goes through a background indexing pipeline and may have the following statuses:
+
+| Status | Meaning |
+|--------|---------|
+| `draft` | Newly created and not yet processed |
+| `processing` | Currently being indexed |
+| `ready` | Available for use by agents |
+| `failed` | Indexing failed due to format or content issues |
+
+<Info>
+Agents can only query RAG sources once the status is `ready`.
+</Info>
+
+### Example of Knowledge Base Source
+<img src="/user-guide/images/source-rag.png" alt="Example Knowledge Base" className="rounded-lg shadow my-4" />
+
+
+---
+
+<div id="forms"/>
+## 📝 Forms 
+
+Forms allow you to collect structured input from users during a conversation. These are defined using valid HTML `<form>` markup and rendered to the user inline during a task.
+
+<Check>
+Forms must include a valid `<form>` element and can contain any HTML inputs (text fields, dropdowns, radios, etc.)
+</Check>
+
+### Example
+
+```html
+<form>
+  <label for="id">Enter ID Number:</label><br/>
+  <input type="text" id="id" name="id" required /><br/>
+  <button type="submit">Submit</button>
+</form>
+```
+
+The agent can reference the submitted values and decide how to proceed — for example, validating a document or continuing a transaction.
+
+
+## Source Readiness Matrix
+
+| Source Type | Input Format | Readiness Rules | Agent Usage |
+|-------------|--------------|------------------|--------------|
+| Static Files | Image, PDF, Excel, DOCX | Immediately ready once uploaded | Preview or display |
+| Knowledge Base | PDF, TXT, URL, Text | Must reach `ready` status | Queried for RAG |
+| Forms | HTML form block | Must be valid HTML | Rendered to user |
+
+
+## How to Create a Source
+
+<Steps>
+
+<Step title="Open cPanel → Sources">
+Navigate to **Sources** in the sidebar to manage or add new sources.
+</Step>
+
+<Step title="Select the Source Type">
+Choose between Static Files, Knowledge Base, or Form.
+<img src="/user-guide/images/source-create.png" alt="Media Upload Configuration" className='rounded-lg'/>
+
+</Step>
+
+<Step title="Add Your Input">
+- Upload file / paste text / insert HTML form
+</Step>
+
+<Step title="Save and Tag">
+Give your source a name and optional tags. For RAG, wait for `ready` status before using.
+</Step>
+
+</Steps>
+
+---
+
+Continue to the [Tools](/user-guide/tools-sources/tools) section to define what your agents can **do** with these sources.

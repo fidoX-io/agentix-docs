@@ -1,0 +1,210 @@
+---
+title: 'Tools'
+description: 'Define the tools your agents can use to take actions during a task'
+icon: 'wrench'
+iconType: 'duotone'
+---
+
+Tools enable agents to **take actions** during conversations — like showing media to the user, collecting documents, or submitting tasks. Tools are assigned to each agent in the PowerLink configuration.
+
+<Info>
+Tools are isolated by action — each agent only has access to the tools granted in that assignment.
+</Info>
+
+## Types of Tools
+
+<CardGroup>
+
+<Card title="🧰 Built-in Tools" size="md" href="#built-in-tools">
+Choose from a set of predefined tools like location capture, media display, handoff, and workflow control.
+</Card>
+
+<Card title="🔌 MCP Tools" size="md" href="#mcp-tools">
+Connect to an MCP server and fetch external tool definitions built outside Agentix.
+</Card>
+
+</CardGroup>
+
+
+<div id="built-in-tools"></div>
+---
+## 🧰 Built-in Tools
+
+Agentix comes with a variety of built-in tools that can be enabled per agent. These tools support key use cases like user interaction, task control, and system integration.
+
+<img src="/user-guide/images/tools-builtin.png" alt="Built-in Tools" className='rounded-xl my-6 shadow'/>
+Build In Tools includes 2 categories:
+- Tools executed at Agent-Side
+- Tools executed at User-Side using RPC protocol
+
+### Example of available Built-in Tools - Executed at Agent-Side
+These tools are executed by the agent itself, allowing it to perform actions like searching the internet or showing media to the user.
+
+<AccordionGroup>
+<Accordion title="search_internet" icon="globe" description="Performs web searches to find real-time information from the internet">
+Enables agents to search the web for current information not available in their training data or kb Sources.
+<br/><br/>
+**Use Cases:**
+- Research current events or trending topics
+- Find product details, prices, or specifications
+- Gather real-time data and statistics
+- Verify facts or get updated information
+</Accordion>
+
+<Accordion title="show_media_to_user" icon="image" description="Displays images, documents, or visual content to users during conversations">
+
+  Allows agents to present visual materials directly to the user track.
+  <br/>  <br/>
+  
+  **Use Cases:**
+  - Show product catalogs or image galleries
+  - Display forms, contracts, or documentation
+  - Present charts, diagrams, or infographics
+  - Share visual instructions or tutorials
+</Accordion>
+
+<Accordion title="submit_workflow_task, reject_workflow_task, record_task_output" icon="diagram-project" description="Controls task completion, rejection, and output recording in workflows">
+Manages the lifecycle and outcomes of tasks within the workflow system.
+<br/><br/>
+**Functions:**
+- `submit_workflow_task` - Marks task as complete and submits results
+- `reject_workflow_task` - Rejects task with specified reasoning
+- `record_task_output` - Saves task results for downstream processing
+<br/>
+**Use Cases:**
+- Quality assurance and approval workflows
+- Task completion tracking and reporting
+- Workflow state management and routing
+</Accordion>
+
+<Accordion title="handoff, cancel_handoff, end_conversation" icon="handshake" description="Manages agent transitions and conversation termination">
+Controls the flow between AI agents, human agents, and conversation endings.
+<br/>
+**Functions:**
+- `handoff` - Transfers conversation to a human agent with context
+- `cancel_handoff` - Cancels pending handoff requests
+- `end_conversation` - Gracefully terminates the conversation
+
+**Use Cases:**
+- Escalating complex issues to human support
+- Transferring specialized queries to experts
+- Completing conversations after resolution
+</Accordion>
+</AccordionGroup>
+
+### Example of available Built-in Tools - Executed at User-Side
+
+These tools are executed by the user while triggered by Agent, allowing them to provide information or perform visual actions that the agent can use.
+
+<AccordionGroup>
+<Accordion title="get_user_location" icon="map-pin" description="Requests user's current geolocation coordinates using device GPS">
+Captures the user's real-time location data for location-based services and verification.
+<br/><br/>
+**Use Cases:**
+- Finding nearby stores or service locations
+- Delivery address verification and routing
+- Location-based compliance and regulations
+- Regional content customization
+</Accordion>
+
+<Accordion title="collect_user_document" icon="file-upload" description="Prompts users to upload files and documents through file picker">
+Enables secure document collection from users for verification and processing workflows.
+<br/><br/>
+**Use Cases:**
+- Identity verification and KYC processes
+- Insurance claim document submission
+- Contract and agreement uploads
+- Medical records and prescription collection
+</Accordion>
+
+<Accordion title="request_user_input" icon="form" description="Displays custom forms in Task Action Panel for structured data collection">
+Creates dynamic forms with custom fields for gathering specific user information and data.
+<br/><br/>
+**Use Cases:**
+- Customer registration and onboarding forms
+- Survey and feedback data collection
+- Order customization and preferences
+- Contact information and profile updates
+</Accordion>
+
+<Note>
+For telephony based interactions, users must use the collaboration web Panel through the invitation link to access these tools. ALLOW_WEB_PANEL shall be switched ON to enable this feature.
+</Note>
+</AccordionGroup>
+
+<Check>
+Built-in tools are ready to use — no configuration required.
+</Check>
+
+<div id="mcp-tools"/>
+---
+
+## 🔌 MCP Tools
+
+MCP (Model Context Protocol) tools allow you to connect your agent to external APIs or microservices that expose callable tools. These tools are defined and served by an MCP server.
+
+### How MCP Tools Work
+
+1. Define and run your MCP server (in Python or Node.js)
+2. Each tool is defined with:
+   - Tool name
+   - Description / Usage Instructions
+3. Add the MCP server URL in the Tools section
+4. Add the tool names under the server
+4. Select which tools from the server to enable for your agent in action
+
+<Info>
+You can add multiple MCP servers to the same agent if needed.
+</Info>
+
+### Example MCP Tool Definition
+
+```python
+@mcp_tool(name="get_weather", description="Fetches current weather for a given city")
+async def get_weather(city: str) -> dict:
+    ...
+```
+
+Agentix will introspect the tool and make it callable via the assistant.
+
+---
+
+## Tool Readiness Matrix
+
+| Tool Type     | Definition Location | Setup Required | Usage Mode |
+|---------------|---------------------|----------------|-------------|
+| Built-in Tools | Agentix core runtime | None | Immediate |
+| MCP Tools     | External MCP server | Define tool + connect server | Pulled at runtime |
+
+---
+
+## How to Create and Assign Tools
+
+<Steps>
+
+<Step title="Open Tools in cPanel">
+Go to the **Tools** section in your Agentix cPanel.
+</Step>
+
+<Step title="Manage Available Tools">
+- For built-in, check the tool names from the list
+- For MCP, paste your MCP server URL and define which tools to expose
+</Step>
+
+<Step title="Open PowerLink → Actions → Tools">
+In your PowerLink configuration, navigate to the **Actions** tab and locate the **Tools** section after assigning Agent.
+</Step>
+
+<Step title="Choose the Tool">
+Select either **Built-in Tool** or **MCP Server Tool**.
+</Step>
+
+<Step title="Save and Test">
+Run a test job using this agent to verify the tools work as expected.
+</Step>
+
+</Steps>
+
+---
+
+Next: Define what **Sources** your agent can access by visiting the [Sources](/user-guide/tools-sources/sources) section.

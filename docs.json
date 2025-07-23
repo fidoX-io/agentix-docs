@@ -46,35 +46,20 @@
 							"user-guide/powerlinks/plk-mastermind"
 						]
 					},
-					
 					{
-						"group": "🛠 Sources & Tools",
+						"group": "🔌 Agent Assignment Utilities",
 						"pages": [
-							"user-guide/tools-sources/define-sources",
-							"user-guide/tools-sources/define-tools",
-							"user-guide/tools-sources/define-mcp-tools"
-						]
-					},
-					{
-						"group": "🎯 Workflows",
-						"pages": [
-							"user-guide/workflows/create-workflow",
-							"user-guide/workflows/design-studio",
-							"user-guide/workflows/configure-workflow"
-						]
-					},
-					{
-						"group": "💼 Jobs & Tasks",
-						"pages": [
-							"user-guide/jobs/create-manage-jobs",
-							"user-guide/jobs/connect-handle-tasks"
+							"user-guide/utilities/instructions",
+							"user-guide/utilities/sources",
+							"user-guide/utilities/tools"
 						]
 					},
 					{
 						"group": "📊 Monitoring",
 						"pages": [
-							"user-guide/monitoring/job-status-output",
-							"user-guide/monitoring/task-status-output"
+							"user-guide/monitoring/dashboard",
+							"user-guide/monitoring/jobs",
+							"user-guide/monitoring/tasks"
 						]
 					},
 					{
@@ -90,22 +75,10 @@
 				"tab": "Developers Guide",
 				"groups": [
 					{
-						"group": "API Overview",
+						"group": "🚀 Getting Started",
 						"pages": [
-							"api-reference/overview",
-							"api-reference/authentication"
-						]
-					},
-					{
-						"group": "API Reference",
-						"pages": [
-							"api-reference/endpoints/workflows",
-							"api-reference/endpoints/powerlinks",
-							"api-reference/endpoints/agents",
-							"api-reference/endpoints/sources",
-							"api-reference/endpoints/tools",
-							"api-reference/endpoints/jobs",
-							"api-reference/endpoints/tasks"
+							"developer-guide/overview",
+							"developer-guide/authentication"
 						]
 					}
 				]
