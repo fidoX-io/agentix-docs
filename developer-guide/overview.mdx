@@ -1,0 +1,156 @@
+---
+title: 'Developer Overview'
+description: 'Build integrations and extend Agentix with APIs, webhooks and custom tools'
+icon: 'code'
+iconType: 'duotone'
+---
+
+Welcome to the Agentix Developer Guide. This documentation helps you integrate with Agentix through APIs, build custom tools and extend the platform's capabilities.
+
+## What You Can Build
+
+<CardGroup cols={2}>
+<Card title="🔗 API Integrations" icon="api" href="/developer-guide/endpoint/create">
+Connect external systems to Agentix using REST APIs for task management and data exchange.
+</Card>
+
+<Card title="🛠️ Custom Tools" icon="wrench" href="/developer-guide/mcp-tools">
+Build custom tools using Model Context Protocol (MCP) servers for specialized agent capabilities.
+</Card>
+
+<Card title="🔔 Webhook Listeners" icon="webhook" href="/developer-guide/endpoint/webhook">
+Receive real-time notifications about task events, job completions and system updates.
+</Card>
+
+<Card title="📊 Data Analytics" icon="chart-line" href="/developer-guide/analytics">
+Extract insights from conversation data, task outcomes and workflow performance metrics.
+</Card>
+</CardGroup>
+
+## Developer Resources
+
+### Core APIs
+
+<AccordionGroup>
+<Accordion title="Task Management API" icon="list-check">
+Create, update and monitor tasks programmatically.
+
+**Key Endpoints:**
+- `POST /tasks` - Create new tasks
+- `GET /tasks/{id}` - Retrieve task details
+- `PUT /tasks/{id}` - Update task status
+- `DELETE /tasks/{id}` - Cancel tasks
+</Accordion>
+
+<Accordion title="Job Workflow API" icon="diagram-project">
+Manage job lifecycles and workflow automation.
+
+**Key Endpoints:**
+- `POST /jobs` - Start new job workflows
+- `GET /jobs/{id}/status` - Check job progress
+- `POST /jobs/{id}/actions` - Trigger job actions
+</Accordion>
+
+<Accordion title="Agent Management API" icon="robot">
+Configure and deploy AI agents for customer interactions.
+
+**Key Endpoints:**
+- `GET /agents` - List available agents
+- `POST /agents/{id}/assign` - Assign agents to tasks
+- `PUT /agents/{id}/config` - Update agent settings
+</Accordion>
+</AccordionGroup>
+
+### SDKs and Libraries
+
+<Tabs>
+<Tab title="Python">
+```python
+pip install agentix-sdk
+
+from agentix import AgentixClient
+
+client = AgentixClient(api_key="your_api_key")
+task = client.tasks.create({
+    "type": "customer_support",
+    "priority": "high",
+    "metadata": {"customer_id": "123"}
+})
+```
+</Tab>
+
+<Tab title="Node.js">
+```javascript
+npm install @agentix/sdk
+
+import { AgentixClient } from '@agentix/sdk';
+
+const client = new AgentixClient({
+  apiKey: 'your_api_key'
+});
+
+const task = await client.tasks.create({
+  type: 'customer_support',
+  priority: 'high',
+  metadata: { customerId: '123' }
+});
+```
+</Tab>
+
+<Tab title="cURL">
+```bash
+curl -X POST "https://api.agentixhub.ai/v1/tasks" \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "type": "customer_support",
+    "priority": "high",
+    "metadata": {"customer_id": "123"}
+  }'
+```
+</Tab>
+</Tabs>
+
+## Getting Started
+
+<Steps>
+<Step title="Get API Access">
+Generate your API keys from the [cPanel Settings](https://launch.agentixhub.ai/cpanel/settings/api) page.
+</Step>
+
+<Step title="Choose Integration Method">
+Select from REST APIs, SDKs or webhook integrations based on your use case.
+</Step>
+
+<Step title="Authenticate Requests">
+Follow the [Authentication Guide](/developer-guide/authentication) to secure your API calls.
+</Step>
+
+<Step title="Build and Test">
+Start with simple API calls and gradually build more complex integrations.
+</Step>
+</Steps>
+
+## Use Cases
+
+### Customer Support Automation
+Integrate Agentix with your helpdesk to automatically:
+- Route tickets to appropriate agents
+- Provide AI-powered initial responses
+- Escalate complex issues to human agents
+
+### E-commerce Workflows
+Build shopping assistance flows that:
+- Guide customers through product selection
+- Process orders and payments
+- Handle returns and refunds
+
+### Lead Generation
+Create conversion-focused experiences that:
+- Qualify prospects through interactive conversations
+- Capture contact information
+- Schedule follow-up appointments
+
+---
+
+Ready to start building? Check out the [Authentication](/developer-guide/authentication) guide to get your API credentials set up.

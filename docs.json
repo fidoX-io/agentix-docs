@@ -63,10 +63,9 @@
 						]
 					},
 					{
-						"group": "🏢 Organization Settings",
+						"group": "⚙️ Settings",
 						"pages": [
-							"user-guide/settings/organization-profile",
-							"user-guide/settings/branding"
+							"user-guide/settings/organization"
 						]
 					}
 				]

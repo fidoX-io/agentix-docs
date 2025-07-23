@@ -1,0 +1,100 @@
+---
+title: 'Authentication'
+description: 'Learn how to authenticate with the Agentix API using API keys and tokens'
+icon: 'key'
+iconType: 'duotone'
+---
+
+Authentication is required for all Agentix API requests. This guide covers how to obtain and use API credentials to securely access the platform.
+
+## API Key Authentication
+
+Agentix uses API key-based authentication for secure access to the platform. You'll need to generate an API key from your cPanel to make authenticated requests.
+
+### Getting Your API Key
+
+<Steps>
+<Step title="Access cPanel">
+Log in to your [Agentix cPanel](https://launch.agentixhub.ai/cpanel) using your account credentials.
+</Step>
+
+<Step title="Navigate to API Settings">
+Go to **Settings** → **API Keys** in the main navigation menu.
+</Step>
+
+<Step title="Generate New API Key">
+Click **Generate New API Key** and provide a descriptive name for your key (e.g., "Production API", "Development Testing").
+</Step>
+
+<Step title="Copy and Store Securely">
+Copy the generated API key immediately and store it securely. You won't be able to view it again.
+</Step>
+</Steps>
+
+## Making Authenticated Requests
+
+Include your API key in all requests using the `Authorization` header:
+
+```bash
+curl -X GET "https://api.agentixhub.ai/v1/tasks" \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json"
+```
+
+### Request Headers
+
+| Header | Value | Required |
+|--------|-------|----------|
+| `Authorization` | `Bearer YOUR_API_KEY` | Yes |
+| `Content-Type` | `application/json` | Yes |
+
+## Security Best Practices
+
+<Warning>
+Keep your API keys secure and never expose them in client-side code or public repositories.
+</Warning>
+
+### Environment Variables
+Store API keys as environment variables:
+
+```bash
+export AGENTIX_API_KEY="your_api_key_here"
+```
+
+### Rate Limiting
+API requests are rate-limited to ensure platform stability:
+- **Standard Plan**: 1,000 requests per hour
+- **Professional Plan**: 5,000 requests per hour
+- **Enterprise Plan**: Custom limits
+
+### Key Rotation
+Regularly rotate your API keys for enhanced security:
+- Generate new keys before old ones expire
+- Update all applications with new credentials
+- Revoke old keys after successful migration
+
+## Error Handling
+
+### Authentication Errors
+
+| Status Code | Error | Description |
+|-------------|-------|-------------|
+| `401` | Unauthorized | Invalid or missing API key |
+| `403` | Forbidden | API key lacks required permissions |
+| `429` | Too Many Requests | Rate limit exceeded |
+
+### Example Error Response
+
+```json
+{
+  "error": {
+    "code": "INVALID_API_KEY",
+    "message": "The provided API key is invalid or expired",
+    "details": "Please check your API key and try again"
+  }
+}
+```
+
+---
+
+Next: Learn how to create and manage tasks using the [Task Management API](/developer-guide/endpoint/create).
