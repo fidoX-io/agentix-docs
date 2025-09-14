@@ -26,7 +26,7 @@
       }
     },
     {
-      "url": "https://launch.agentixhub.ai",
+      "url": "https://launch.agentixhub.ai/api",
       "description": "Agentix Hub Core API"
     }
   ],
