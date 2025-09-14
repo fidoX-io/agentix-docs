@@ -88,6 +88,10 @@
 					}
 		
 				]
+			},
+			{
+				"tab": "API Reference",
+				"openapi": "openapi.json"
 			}
 		]
 	},

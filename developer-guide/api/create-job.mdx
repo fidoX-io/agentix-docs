@@ -1,478 +1,120 @@
 ---
-title: 'Create Job'
-description: 'Create new job using Agentix Core API'
+title: 'Create Job API'
+description: 'Learn how to create jobs using the Agentix Core API'
 icon: 'plus'
-iconType: 'duotone'
 ---
 
-The Create Job API endpoint allows you to programmatically start new jobs (workflows) in Agentix. This is the primary integration point for external systems like CRMs, ticketing platforms and web applications.
+## Overview
 
-<Info>
-Jobs represent workflow instances that process customer interactions through your configured PowerLinks and agents.
-</Info>
+The Create Job API allows you to programmatically create new customer journey jobs in Agentix. This endpoint is the primary way to initiate automated workflows through the Agentix platform.
+
+## How It Works
+
+When you create a job through the API:
+
+1. **Workflow Assignment**: Specify which workflow ID to execute
+2. **Customer Data**: Provide customer information (name, mobile, email, etc.)
+3. **Job Configuration**: Set expiration time, language, and metadata
+4. **Input Parameters**: Pass dynamic data to customize the workflow execution
+
+## Key Concepts
+
+### Workflow ID
+Every job must be associated with a pre-configured workflow in your Agentix dashboard. The workflow defines the customer journey steps and automation logic.
+
+### Expiration Time
+Jobs have a validity period (`validUntil`) specified in seconds. After this time, the job becomes inaccessible to customers.
+
+### Customer Information
+Provide customer details to personalize the experience and enable agent handoffs when needed.
+
+### Dynamic Inputs
+Use the `input` array to pass variable data that workflows can utilize for personalization and decision-making.
 
 ## Authentication
 
-All API requests require authentication using your organization's API key.
+All API requests require authentication using your API key in the `x-api-key` header.
 
-<CodeGroup>
-```bash Headers
-x-api-key: YOUR_API_KEY
-Content-Type: application/json
-```
+<Info>
+**Getting your API Key:** Contact your organization administrator to generate an Integration API key. Only administrators can create API keys.
+</Info>
 
-```bash Get API Key
-# Contact your organization administrator to get your Integration API key.
-# Only organization administrators can generate API keys.
-```
-</CodeGroup>
+## Interactive Testing
 
-## Endpoint
+<Card title="Try the API Now" icon="play" href="/api-reference/create-job">
+  Test the Create Job endpoint with your own data and server URL in our interactive API playground.
+</Card>
 
-<CodeGroup>
-```http Request
-POST /v1/jobs
-```
+## Request Structure
 
-```bash Base URL
-https://launch.agentixhub.ai/api
-```
-</CodeGroup>
-
-## Request Parameters
-
-### Body Parameters
-
-<ParamField body="data" type="object" required>
-  The job creation data object containing all workflow and customer information.
-
-  <Expandable title="data properties" defaultOpen>
-    <ParamField body="workflow" type="integer" required>
-      The unique identifier of the workflow to execute. Get this from your cPanel → Workflows.
-    </ParamField>
-
-    <ParamField body="validUntil" type="integer" required>
-      Time in seconds until the job request expires. Recommended range: 60-3600 seconds.
-    </ParamField>
-
-    <ParamField body="language" type="string" default="en">
-      Language code for the conversation interface (e.g., "en", "ar", "fr").
-    </ParamField>
-
-    <ParamField body="customer" type="object">
-      Customer information for the job.
-      
-      <Expandable title="customer properties">
-        <ParamField body="name" type="string">
-          Full name of the customer
-        </ParamField>
-        
-        <ParamField body="mobile" type="string">
-          Customer's mobile phone number in international format
-        </ParamField>
-        
-        <ParamField body="email" type="string">
-          Customer's email address
-        </ParamField>
-        
-        <ParamField body="customerID" type="string">
-          Your internal customer identifier or reference
-        </ParamField>
-      </Expandable>
-    </ParamField>
-
-    <ParamField body="externalRefNumber" type="string">
-      External system reference number (CRM ID, ticket number, etc.)
-    </ParamField>
-
-    <ParamField body="metadata" type="string">
-      Additional context or notes about the job
-    </ParamField>
-
-    <ParamField body="input" type="array">
-      Array of input parameters for the workflow
-      
-      <Expandable title="input item properties">
-        <ParamField body="key" type="string" required>
-          Parameter key name
-        </ParamField>
-        
-        <ParamField body="value" type="string" required>
-          Parameter value
-        </ParamField>
-        
-        <ParamField body="type" type="string" required>
-          Data type (TEXT, NUMBER, EMAIL, PHONE, etc.)
-        </ParamField>
-        
-        <ParamField body="description" type="string">
-          Human-readable description of the parameter
-        </ParamField>
-      </Expandable>
-    </ParamField>
-  </Expandable>
-</ParamField>
-
-## Request Example
-
-<CodeGroup>
-```json Request Body
+```json
 {
   "data": {
-    "workflow": 65,
-    "validUntil": 120,
+    "workflow": 123,
+    "validUntil": 86400,
     "language": "en",
     "customer": {
-      "name": "Jane Doe",
-      "mobile": "+12025550123",
-      "email": "jane@example.com",
-      "customerID": "LEAD_12345"
+      "name": "John Doe",
+      "mobile": "+1234567890",
+      "email": "john@example.com",
+      "customerID": "CUST-001"
     },
-    "externalRefNumber": "ZOHO_12345",
-    "metadata": "Created from Zoho CRM Lead",
+    "externalRefNumber": "REF-12345",
+    "metadata": "Additional context data",
     "input": [
       {
-        "key": "lead_name",
-        "value": "Jane Doe",
-        "type": "TEXT",
-        "description": "Full name of the lead"
-      },
-      {
-        "key": "phone_number",
-        "value": "+12025550123",
-        "type": "PHONE",
-        "description": "Lead phone number"
-      },
-      {
-        "key": "lead_source",
-        "value": "Website Contact Form",
-        "type": "TEXT",
-        "description": "Source of the lead"
+        "key": "productType",
+        "value": "premium",
+        "type": "string",
+        "description": "Product tier for customization"
       }
     ]
   }
 }
 ```
 
-```bash cURL
-curl -X POST "https://api.agentixhub.ai/v1/jobs" \
-  -H "x-api-key: YOUR_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "data": {
-      "workflow": 65,
-      "validUntil": 120,
-      "language": "en",
-      "customer": {
-        "name": "Jane Doe",
-        "mobile": "+12025550123",
-        "email": "jane@example.com",
-        "customerID": "LEAD_12345"
-      },
-      "externalRefNumber": "ZOHO_12345",
-      "metadata": "Created from Zoho CRM Lead",
-      "input": [
-        {
-          "key": "lead_name",
-          "value": "Jane Doe",
-          "type": "TEXT",
-          "description": "Full name of the lead"
-        }
-      ]
-    }
-  }'
-```
+## Response Structure
 
-```python Python
-import requests
-
-url = "https://api.agentixhub.ai/v1/jobs"
-headers = {
-    "x-api-key": "YOUR_API_KEY",
-    "Content-Type": "application/json"
-}
-
-data = {
-    "data": {
-        "workflow": 65,
-        "validUntil": 120,
-        "language": "en",
-        "customer": {
-            "name": "Jane Doe",
-            "mobile": "+12025550123",
-            "email": "jane@example.com",
-            "customerID": "LEAD_12345"
-        },
-        "externalRefNumber": "ZOHO_12345",
-        "metadata": "Created from Zoho CRM Lead",
-        "input": [
-            {
-                "key": "lead_name",
-                "value": "Jane Doe",
-                "type": "TEXT",
-                "description": "Full name of the lead"
-            }
-        ]
-    }
-}
-
-response = requests.post(url, headers=headers, json=data)
-print(response.json())
-```
-
-```javascript Node.js
-const axios = require('axios');
-
-const url = 'https://api.agentixhub.ai/v1/jobs';
-const headers = {
-  'x-api-key': 'YOUR_API_KEY',
-  'Content-Type': 'application/json'
-};
-
-const data = {
-  data: {
-    workflow: 65,
-    validUntil: 120,
-    language: 'en',
-    customer: {
-      name: 'Jane Doe',
-      mobile: '+12025550123',
-      email: 'jane@example.com',
-      customerID: 'LEAD_12345'
-    },
-    externalRefNumber: 'ZOHO_12345',
-    metadata: 'Created from Zoho CRM Lead',
-    input: [
-      {
-        key: 'lead_name',
-        value: 'Jane Doe',
-        type: 'TEXT',
-        description: 'Full name of the lead'
-      }
-    ]
-  }
-};
-
-axios.post(url, data, { headers })
-  .then(response => console.log(response.data))
-  .catch(error => console.error(error.response.data));
-```
-</CodeGroup>
-
-## Response
-
-### Success Response
-
-<CodeGroup>
-```json 201 Created
+```json
 {
   "success": true,
   "data": {
-    "jobId": "job_1a2b3c4d5e6f",
-    "status": "created",
+    "jobId": "job_abc123def456",
+    "status": "active",
     "workflow": {
-      "id": 65,
-      "name": "Lead Qualification Workflow"
+      "id": 123,
+      "name": "Customer Onboarding"
     },
     "customer": {
-      "name": "Jane Doe",
-      "mobile": "+12025550123",
-      "email": "jane@example.com",
-      "customerID": "LEAD_12345"
+      "name": "John Doe",
+      "mobile": "+1234567890",
+      "email": "john@example.com",
+      "customerID": "CUST-001"
     },
-    "externalRefNumber": "ZOHO_12345",
-    "createdAt": "2025-08-23T14:30:00Z",
-    "validUntil": "2025-08-23T14:32:00Z",
-    "accessUrl": "https://chat.agentixhub.ai/job/job_1a2b3c4d5e6f"
+    "externalRefNumber": "REF-12345",
+    "createdAt": "2024-01-15T10:30:00Z",
+    "validUntil": "2024-01-16T10:30:00Z",
+    "accessUrl": "https://launch.agentixhub.ai/j/abc123def456"
   }
 }
 ```
 
-```json Response Fields
-{
-  "jobId": "Unique identifier for the created job",
-  "status": "Job status (created, running, completed, failed)",
-  "workflow": "Workflow information",
-  "customer": "Customer details provided in request",
-  "externalRefNumber": "External reference from request",
-  "createdAt": "ISO timestamp of job creation",
-  "validUntil": "ISO timestamp when job expires",
-  "accessUrl": "Direct URL for customer to access the job"
-}
-```
-</CodeGroup>
+## Error Responses
 
-### Error Responses
+| Status Code | Description |
+|-------------|-------------|
+| 400 | Bad request - Invalid request format or missing required fields |
+| 401 | Unauthorized - Invalid or missing API key |
+| 404 | Workflow not found - The specified workflow ID doesn't exist |
+| 429 | Rate limit exceeded - Too many requests |
 
-<CodeGroup>
-```json 400 Bad Request
-{
-  "success": false,
-  "error": {
-    "code": "INVALID_REQUEST",
-    "message": "Missing required field: workflow",
-    "details": {
-      "field": "workflow",
-      "expected": "integer",
-      "received": "null"
-    }
-  }
-}
-```
+## Next Steps
 
-```json 401 Unauthorized
-{
-  "success": false,
-  "error": {
-    "code": "INVALID_API_KEY",
-    "message": "The provided API key is invalid or expired",
-    "details": "Please check your API key in cPanel → Settings → API Keys"
-  }
-}
-```
+1. **Get Your API Key**: Contact your administrator to obtain API credentials
+2. **Test the Endpoint**: Use the interactive playground in the API Reference section
+3. **Integrate**: Add the API calls to your application workflow
+4. **Monitor**: Track job creation and customer engagement through the Agentix dashboard
 
-```json 404 Not Found
-{
-  "success": false,
-  "error": {
-    "code": "WORKFLOW_NOT_FOUND",
-    "message": "Workflow with ID 65 not found",
-    "details": "Please verify the workflow ID exists in your organization"
-  }
-}
-```
-
-```json 429 Too Many Requests
-{
-  "success": false,
-  "error": {
-    "code": "RATE_LIMIT_EXCEEDED",
-    "message": "Too many requests. Please try again later.",
-    "details": {
-      "limit": 100,
-      "window": "1 hour",
-      "retryAfter": 3600
-    }
-  }
-}
-```
-</CodeGroup>
-
-## Use Cases
-
-<CardGroup cols={2}>
-<Card title="CRM Integration" icon="users">
-Automatically create jobs when leads are created or updated in your CRM system.
-</Card>
-
-<Card title="Website Forms" icon="globe">
-Trigger workflows when customers submit contact forms or support requests.
-</Card>
-
-<Card title="E-commerce Orders" icon="shopping-cart">
-Start customer service workflows for new orders or support inquiries.
-</Card>
-
-<Card title="Support Tickets" icon="headset">
-Create jobs for helpdesk tickets that require agent assistance.
-</Card>
-</CardGroup>
-
-## Best Practices
-
-<AccordionGroup>
-<Accordion title="Error Handling" icon="triangle-exclamation">
-Always implement proper error handling in your integration:
-
-```javascript
-try {
-  const response = await createJob(jobData);
-  console.log('Job created:', response.data.jobId);
-} catch (error) {
-  if (error.response?.status === 400) {
-    console.error('Invalid request:', error.response.data.error.message);
-  } else if (error.response?.status === 429) {
-    console.log('Rate limited, retrying after delay...');
-    // Implement exponential backoff
-  } else {
-    console.error('Unexpected error:', error.message);
-  }
-}
-```
-</Accordion>
-{/* 
-<Accordion title="Webhook Integration" icon="webhook">
-For real-time integrations, set up webhooks to receive job status updates:
-
-```javascript
-// Example webhook handler
-app.post('/webhook/job-status', (req, res) => {
-  const { jobId, status, data } = req.body;
-  
-  switch (status) {
-    case 'completed':
-      console.log(`Job ${jobId} completed successfully`);
-      // Update your system
-      break;
-    case 'failed':
-      console.log(`Job ${jobId} failed:`, data.error);
-      // Handle failure
-      break;
-  }
-  
-  res.status(200).send('OK');
-});
-```
-</Accordion> */}
-
-<Accordion title="Input Validation" icon="shield-check">
-Validate input data before sending to the API:
-
-```javascript
-function validateJobData(data) {
-  const required = ['workflow', 'validUntil'];
-  const missing = required.filter(field => !data[field]);
-  
-  if (missing.length > 0) {
-    throw new Error(`Missing required fields: ${missing.join(', ')}`);
-  }
-  
-  if (data.validUntil < 60 || data.validUntil > 3600) {
-    throw new Error('validUntil must be between 60 and 3600 seconds');
-  }
-  
-  return true;
-}
-```
-</Accordion>
-</AccordionGroup>
-
-## Rate Limits
-
-<Warning>
-API requests are rate-limited to ensure platform stability. Current limits are:
-
-- **100 requests per hour** per API key
-- **10 requests per minute** for burst traffic
-- Rate limit headers are included in all responses
-</Warning>
-
-{/* ## Next Steps
-
-<CardGroup cols={2}>
-<Card title="Job Status" icon="clock" href="/developer-guide/api/job-status">
-Monitor job progress and retrieve status updates
-</Card>
-
-<Card title="Webhooks" icon="webhook" href="/developer-guide/api/webhooks">
-Set up real-time notifications for job events
-</Card>
-
-<Card title="Authentication" icon="key" href="/developer-guide/authentication">
-Learn more about API authentication and security
-</Card>
-
-<Card title="SDKs" icon="code" href="/developer-guide/sdks">
-Use our official SDKs for easier integration
-</Card>
-</CardGroup> */}
+<Tip>
+For real-time testing with your own server configuration, visit the **[API Reference → Create Job](/api-reference/create-job)** where you can enter custom server URLs and test with live data.
+</Tip>

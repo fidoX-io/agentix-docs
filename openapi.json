@@ -1,0 +1,145 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Agentix API",
+    "version": "1.0.0",
+    "description": "OpenAPI spec for Agentix job creation endpoint."
+  },
+  "servers": [
+    {
+      "url": "{protocol}://{host}{basePath}",
+      "description": "Custom Agentix API Server",
+      "variables": {
+        "protocol": {
+          "enum": ["https", "http"],
+          "default": "https",
+          "description": "The protocol scheme"
+        },
+        "host": {
+          "default": "launch.agentixhub.ai",
+          "description": "Your Agentix server domain (e.g., launch.agentixhub.ai or api.yourdomain.com)"
+        },
+        "basePath": {
+          "default": "/api",
+          "description": "Base API path (usually /api)"
+        }
+      }
+    },
+    {
+      "url": "https://launch.agentixhub.ai",
+      "description": "Agentix Hub Core API"
+    }
+  ],
+  "paths": {
+    "/v1/jobs": {
+      "post": {
+        "summary": "Create Job",
+        "description": "Create a new job using Agentix Core API.",
+        "operationId": "createJob",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "data": {
+                    "type": "object",
+                    "properties": {
+                      "workflow": { "type": "integer", "description": "Workflow ID to execute." },
+                      "validUntil": { "type": "integer", "description": "Expiration in seconds." },
+                      "language": { "type": "string", "description": "Conversation language." },
+                      "customer": {
+                        "type": "object",
+                        "properties": {
+                          "name": { "type": "string" },
+                          "mobile": { "type": "string" },
+                          "email": { "type": "string" },
+                          "customerID": { "type": "string" }
+                        }
+                      },
+                      "externalRefNumber": { "type": "string" },
+                      "metadata": { "type": "string" },
+                      "input": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "key": { "type": "string" },
+                            "value": { "type": "string" },
+                            "type": { "type": "string" },
+                            "description": { "type": "string" }
+                          }
+                        }
+                      }
+                    },
+                    "required": ["workflow", "validUntil"]
+                  }
+                },
+                "required": ["data"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Job created successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "jobId": { "type": "string" },
+                        "status": { "type": "string" },
+                        "workflow": {
+                          "type": "object",
+                          "properties": {
+                            "id": { "type": "integer" },
+                            "name": { "type": "string" }
+                          }
+                        },
+                        "customer": {
+                          "type": "object",
+                          "properties": {
+                            "name": { "type": "string" },
+                            "mobile": { "type": "string" },
+                            "email": { "type": "string" },
+                            "customerID": { "type": "string" }
+                          }
+                        },
+                        "externalRefNumber": { "type": "string" },
+                        "createdAt": { "type": "string" },
+                        "validUntil": { "type": "string" },
+                        "accessUrl": { "type": "string" }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": { "description": "Bad request." },
+          "401": { "description": "Unauthorized." },
+          "404": { "description": "Workflow not found." },
+          "429": { "description": "Rate limit exceeded." }
+        },
+        "security": [
+          { "ApiKeyAuth": [] }
+        ]
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ApiKeyAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "x-api-key"
+      }
+    }
+  }
+}

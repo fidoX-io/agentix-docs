@@ -172,6 +172,68 @@ These parameters control the behavior of the Realtime PowerLink at the **PowerLi
   Phone number to use for outbound calls.
   </ParamField>
 
+  <ParamField path="ACTION_PANEL" type="LIST" default="ON">
+  Enable/Disable action panel for the user.
+  </ParamField>
+
+  | Value | Description |
+  |-------|-------------|
+  | `ON`  | Enable action panel |
+  | `OFF` | Disable action panel |
+
+  <ParamField path="VISUALIZER_BACKGROUND_IMAGE" type="MEDIA">
+  Background image for AI agent during the conversation.
+  </ParamField>
+
+  <ParamField path="VISUALIZER_TYPE" type="LIST" default="3D-SPHERE">
+  Select the visualizer type for AI agent during the conversation.
+  </ParamField>
+
+  | Value | Description | Preview |
+  |-------|-------------|---------|
+  | `BAR` | Bar visualizer with audio wave patterns | <img src="/user-guide/images/visualizer-bar.png" alt="Bar Visualizer" width="60" className="rounded" /> |
+  | `3D-SPHERE` | 3D sphere visualizer with dynamic animations | <img src="/user-guide/images/visualizer-3d-sphere.png" alt="3D Sphere Visualizer" width="60" className="rounded" /> |
+
+  <ParamField path="VISUALIZER_CONFIG" type="TEXT" default='{\n  "width": 450,\n  "height": 450,\n  "state_label": "ON",\n  "state_colors": {\n    "disconnected": "#333333",\n    "connecting": "#FFAA00",\n    "initializing": "#00AAFF",\n    "listening": "#00FF88",\n    "thinking": "#AA00FF",\n    "speaking": "#88DDFF"\n  }\n}'>
+  Configuration options for the AI agent visualizer. This JSON object controls the appearance and behavior of the visualizer during different conversation states.
+
+  **Configuration Structure:**
+  ```json
+  {
+    "width": 450,              // Width of the visualizer in pixels
+    "height": 450,             // Height of the visualizer in pixels
+    "state_label": "ON",       // Display state labels: "ON" or "OFF"
+    "state_colors": {
+      "disconnected": "#333333", // Color when agent is disconnected (dark gray)
+      "connecting": "#FFAA00",   // Color when establishing connection (amber)
+      "initializing": "#00AAFF", // Color during initialization (bright blue)
+      "listening": "#00FF88",    // Color when agent is listening (green)
+      "thinking": "#AA00FF",     // Color when agent is processing (purple)
+      "speaking": "#88DDFF"      // Color when agent is speaking (light blue)
+    }
+  }
+  ```
+
+  **Parameter Details:**
+  - `width` & `height`: Control the size of the visualizer canvas (recommended: 450x450)
+  - `state_label`: Shows current state text below visualizer when set to "ON"
+  - `state_colors`: Hex color codes for different conversation states
+    - **disconnected**: No active connection
+    - **connecting**: Establishing connection to agent
+    - **initializing**: Loading agent and preparing session
+    - **listening**: Agent is actively listening to user input
+    - **thinking**: Agent is processing user request
+    - **speaking**: Agent is providing response
+
+  <Note>
+  Use standard hex color codes (e.g., #FF0000 for red). Colors should provide good contrast and be accessible for all users.
+  </Note>
+  </ParamField>
+
+  <ParamField path="QUEUE_WAITING_MESSAGE" type="TEXT" default="We are experiencing a high number of requests right now.\nThank you for your patience while we connect you to the next available assistant.">
+  Message to display while waiting in the queue.
+  </ParamField>
+
 </Expandable>
 
 
@@ -203,11 +265,15 @@ These parameters control the behavior of the Realtime PowerLink at the **PowerLi
       |----------|-------|
       | OpenAI | `gpt-4o-mini-realtime-preview-2024-12-17` |
       | OpenAI | `gpt-4o-realtime-preview-2024-12-17` |
+      | OpenAI | `gpt-4o-realtime-preview` |
+      | OpenAI | `gpt-4o-mini-realtime-preview` |
       | Google | `gemini-2.0-flash-exp` |
+      | Google | `gemini-2.0-flash-live-001` |
       | Google | `gemini-2.5-flash-preview-native-audio-dialog` |
+      | Google | `gemini-2.5-flash-exp-native-audio-thinking-dialog` |
 
       <ParamField path="TEMPERATURE" type="TEXT" default="0.8">
-      0-1 Default 0.8 (Minimum allowed temperature = 0.6)
+      Temperature control from 0-1 (Default: 0.8). Minimum allowed temperature is 0.6.
       </ParamField>
 
       <ParamField path="VOICE" type="LIST" default="openai:alloy">
@@ -220,28 +286,123 @@ These parameters control the behavior of the Realtime PowerLink at the **PowerLi
       | Google | `Puck`, `Charon`, `Kore`, `Fenrir`, `Aoede`, `Leda`, `Orus`, `Zephyr` |
 
       <ParamField path="PRONUNCIATIONS" type="TEXT">
-      Add Custom pronunciations rules for names and terms. Use multi-line with trailing semicolon for each entry.
-      Format: `language_code|name=pronunciation;`
+      Add custom pronunciation rules for names and terms. Use multi-line format with trailing semicolon.
+
+      **Format:** `language_code|name=pronunciation;`
+
+      **Examples:**
+      ```
+      en|1=One;
+      ar|2=اثنان;
+      fr|3=trois;
+      ```
       </ParamField>
+
+      <ParamField path="VERBALIZE_NUMBERS" type="LIST" default="OFF">
+      Control whether numbers in RAG content are verbalized during conversation.
+      </ParamField>
+
+      | Value | Description |
+      |-------|-------------|
+      | `ON` | Verbalize numbers in conversation |
+      | `OFF` | Do not verbalize numbers |
 
       <ParamField path="USER_RESPONSE_TIMEOUT" type="TEXT" default="30">
       Timeout for user response in seconds.
+      </ParamField>
+
+      <ParamField path="MAX_REMINDERS" type="TEXT" default="3">
+      Maximum number of reminders to send to the user before considering hangup.
       </ParamField>
 
       <ParamField path="HANDOFF" type="LIST" default="OFF">
       Select the handoff provider for the assistant. Disable by selecting OFF.
       </ParamField>
 
-      <ParamField path="AVATAR" type="LIST" default="OFF">
-      Select the avatar for the assistant. Select OFF to disable avatar or select provider with its related parameters.
+      | Value | Description |
+      |-------|-------------|
+      | `OFF` | No handoff capability |
+      | `NOVOMIND` | Integration with Novomind platform |
+
+      <ParamField path="HANDOFF_PLUGIN_URL" type="TEXT">
+      Custom handoff plugin URL for the assistant.
       </ParamField>
 
-      | Avatar | Description |
+      <ParamField path="HANDOFF_LIVE_ASSIST_AGENT" type="LIST" default="OFF">
+      Live assist agent to dispatch call upon successful handoff.
+      </ParamField>
+
+      | Value | Description |
+      |-------|-------------|
+      | `OFF` | No live assist integration |
+      | `agent-live-assist` | Standard live assist agent |
+      | `live-assist-agent` | Alternative live assist agent |
+
+      <ParamField path="WHATSAPP_NOTIFICATION" type="LIST" default="OFF">
+      Select WhatsApp notification provider for the assistant.
+      </ParamField>
+
+      | Value | Description |
+      |-------|-------------|
+      | `OFF` | No WhatsApp notifications |
+      | `NOVOMIND` | WhatsApp integration via Novomind |
+
+      <ParamField path="EMAIL_NOTIFICATION" type="LIST" default="OFF">
+      Select Email notification provider for the assistant.
+      </ParamField>
+
+      | Value | Description |
+      |-------|-------------|
+      | `OFF` | No email notifications |
+
+      <ParamField path="BACKGROUND_AUDIO" type="MULTI">
+      Select background audio options for the conversation environment.
+      </ParamField>
+
+      | Option | Description |
       |--------|-------------|
-      | OFF | No avatar |
-      | Sandra | `tavus:name=Sandra` |
-      | Steph | `tavus:name=Steph` |
-      | James | `tavus:name=James` |
+      | `OFFICE_AMBIENCE` | Office ambient sounds |
+      | `music01.ogg` | Background music track |
+
+      <ParamField path="BACKGROUND_AUDIO_VOLUME" type="TEXT" default="0.5">
+      Volume level for background audio (0-1 range, e.g., 0.5 for 50%).
+      </ParamField>
+
+      <ParamField path="THINKING_SOUND" type="MULTI" default="KEYBOARD_TYPING,KEYBOARD_TYPING2">
+      Select sound effects to play while the agent is in thinking state.
+      </ParamField>
+
+      | Option | Description |
+      |--------|-------------|
+      | `KEYBOARD_TYPING` | Keyboard typing sound effect |
+      | `KEYBOARD_TYPING2` | Alternative keyboard typing sound |
+      | `bell.ogg` | Bell notification sound |
+      | `screenshot.ogg` | Screenshot capture sound |
+
+      <ParamField path="THINKING_SOUND_VOLUME" type="TEXT" default="0.8">
+      Volume level for thinking sounds (0-1 range, e.g., 0.8 for 80%).
+      </ParamField>
+
+      <ParamField path="AVATAR" type="LIST" default="OFF">
+      Select the avatar for the assistant. Choose OFF to disable or select a provider.
+      </ParamField>
+
+      | Avatar | Configuration |
+      |--------|---------------|
+      | `OFF` | No avatar |
+      | `Sandra` | `tavus:name=Sandra\|replica=r9fa0878977a\|persona=pc074769bad9` |
+      | `Steph` | `tavus:name=Steph\|replica=r9c55f9312fb\|persona=pc074769bad9` |
+      | `James` | `tavus:name=James\|replica=r70c81a0519b\|persona=pc074769bad9` |
+
+      <ParamField path="TELEPHONY_WEB_PANEL" type="LIST" default="OFF">
+      Enable telephony web panel integration. When enabled, the AI agent will send notifications to users to open the web panel.
+      </ParamField>
+
+      | Value | Description |
+      |-------|-------------|
+      | `ON` | Enable telephony web panel |
+      | `OFF` | Disable telephony web panel |
+
       </Expandable>
   </Card>
 
@@ -263,42 +424,180 @@ These parameters control the behavior of the Realtime PowerLink at the **PowerLi
 
     <Expandable title="Agent Parameters">
 
-      <ParamField path="STT" type="LIST" default="gladia">
-      Select the STT (Speech-to-Text) provider for the assistant.
+      <ParamField path="STT" type="LIST" default="openai:whisper-1">
+      Select the Speech-to-Text provider and model.
       </ParamField>
 
-      | Provider | Options |
-      |----------|---------|
-      | Gladia | `gladia` |
-      | OpenAI | `whisper-1`, `gpt-4o-mini-transcribe` |
-      | Groq | `whisper-large-v3`, `whisper-large-v3-turbo` |
-      | Deepgram | `nova-2`, `nova-3` |
+      | Provider | Model |
+      |----------|-------|
+      | OpenAI | `whisper-1` |
+      | Google | `latest_long` |
+      | Google | `nova-2` |
+      | Groq | `whisper-large-v3` |
+      | Deepgram | `nova-2` |
+      | Azure | `whisper` |
+      | Assembly AI | `best` |
+      | AWS | `transcribe` |
 
-      <ParamField path="LLM" type="LIST" default="openai:gpt-4o-mini">
+      <ParamField path="LLM" type="LIST" default="openai:gpt-4o">
       Select the LLM provider and model for the assistant.
       </ParamField>
 
-      <ParamField path="TTS" type="LIST" default="openai:gpt-4o-mini-tts">
-      Select the TTS (Text-to-Speech) provider for the assistant.
+      | Provider | Model |
+      |----------|-------|
+      | OpenAI | `gpt-4o` |
+      | OpenAI | `gpt-4o-mini` |
+      | OpenAI | `o1` |
+      | OpenAI | `o1-mini` |
+      | OpenAI | `o1-preview` |
+      | Google | `gemini-1.5-flash` |
+      | Google | `gemini-1.5-pro` |
+      | Google | `gemini-exp-1206` |
+      | Groq | `llama-3.3-70b-versatile` |
+      | Groq | `llama-3.2-90b-text-preview` |
+      | Claude | `claude-3-5-sonnet-20241022` |
+      | Mistral | `mistral-large-2407` |
+      | xAI | `grok-beta` |
+
+      <ParamField path="TTS" type="LIST" default="openai:tts-1">
+      Select the Text-to-Speech provider and model.
       </ParamField>
 
-      | Provider | Options |
-      |----------|---------|
-      | OpenAI | `tts-1`, `gpt-4o-mini-tts`, `tts-1-hd` |
-      | ElevenLabs | `eleven_turbo_v2_5`, `eleven_multilingual_v2` |
-      | Azure | `Azure` |
+      | Provider | Model | Voice Options |
+      |----------|-------|---------------|
+      | OpenAI | `tts-1` | `alloy`, `echo`, `fable`, `onyx`, `nova`, `shimmer` |
+      | OpenAI | `tts-1-hd` | `alloy`, `echo`, `fable`, `onyx`, `nova`, `shimmer` |
+      | ElevenLabs | `eleven_multilingual_v2` | Various premium voices |
+      | Google | `standard` | Multiple language voices |
+      | Azure | `neural` | Multiple language voices |
+      | Deepgram | `aura` | `asteria`, `luna`, `stella`, `athena`, `hera`, `orion`, `arcas`, `perseus`, `angus`, `orpheus`, `helios`, `zeus` |
 
-      <ParamField path="VOICE" type="LIST" default="openai:alloy">
-      Select the voice for the assistant.
+      <ParamField path="TEMPERATURE" type="TEXT" default="0.8">
+      Temperature control from 0-1 (Default: 0.8). Minimum allowed temperature is 0.6.
       </ParamField>
 
-      <ParamField path="ALLOW_OPENING_INTERRUPT" type="LIST" default="ON">
-      Allow user to interrupt the opening welcome prompt.
+      <ParamField path="VOICE" type="TEXT" default="alloy">
+      Select the voice for the assistant based on the TTS provider chosen above.
       </ParamField>
+
+      <ParamField path="PRONUNCIATIONS" type="TEXT">
+      Add custom pronunciation rules for names and terms. Use multi-line format with trailing semicolon.
+
+      **Format:** `language_code|name=pronunciation;`
+
+      **Examples:**
+      ```
+      en|1=One;
+      ar|2=اثنان;
+      fr|3=trois;
+      ```
+      </ParamField>
+
+      <ParamField path="VERBALIZE_NUMBERS" type="LIST" default="OFF">
+      Control whether numbers in RAG content are verbalized during conversation.
+      </ParamField>
+
+      | Value | Description |
+      |-------|-------------|
+      | `ON` | Verbalize numbers in conversation |
+      | `OFF` | Do not verbalize numbers |
 
       <ParamField path="USER_RESPONSE_TIMEOUT" type="TEXT" default="30">
       Timeout for user response in seconds.
       </ParamField>
+
+      <ParamField path="MAX_REMINDERS" type="TEXT" default="3">
+      Maximum number of reminders to send to the user before considering hangup.
+      </ParamField>
+
+      <ParamField path="HANDOFF" type="LIST" default="OFF">
+      Select the handoff provider for the assistant. Disable by selecting OFF.
+      </ParamField>
+
+      | Value | Description |
+      |-------|-------------|
+      | `OFF` | No handoff capability |
+      | `NOVOMIND` | Integration with Novomind platform |
+
+      <ParamField path="HANDOFF_PLUGIN_URL" type="TEXT">
+      Custom handoff plugin URL for the assistant.
+      </ParamField>
+
+      <ParamField path="HANDOFF_LIVE_ASSIST_AGENT" type="LIST" default="OFF">
+      Live assist agent to dispatch call upon successful handoff.
+      </ParamField>
+
+      | Value | Description |
+      |-------|-------------|
+      | `OFF` | No live assist integration |
+      | `agent-live-assist` | Standard live assist agent |
+      | `live-assist-agent` | Alternative live assist agent |
+
+      <ParamField path="WHATSAPP_NOTIFICATION" type="LIST" default="OFF">
+      Select WhatsApp notification provider for the assistant.
+      </ParamField>
+
+      | Value | Description |
+      |-------|-------------|
+      | `OFF` | No WhatsApp notifications |
+      | `NOVOMIND` | WhatsApp integration via Novomind |
+
+      <ParamField path="EMAIL_NOTIFICATION" type="LIST" default="OFF">
+      Select Email notification provider for the assistant.
+      </ParamField>
+
+      | Value | Description |
+      |-------|-------------|
+      | `OFF` | No email notifications |
+
+      <ParamField path="BACKGROUND_AUDIO" type="MULTI">
+      Select background audio options for the conversation environment.
+      </ParamField>
+
+      | Option | Description |
+      |--------|-------------|
+      | `OFFICE_AMBIENCE` | Office ambient sounds |
+      | `music01.ogg` | Background music track |
+
+      <ParamField path="BACKGROUND_AUDIO_VOLUME" type="TEXT" default="0.5">
+      Volume level for background audio (0-1 range, e.g., 0.5 for 50%).
+      </ParamField>
+
+      <ParamField path="THINKING_SOUND" type="MULTI" default="KEYBOARD_TYPING,KEYBOARD_TYPING2">
+      Select sound effects to play while the agent is in thinking state.
+      </ParamField>
+
+      | Option | Description |
+      |--------|-------------|
+      | `KEYBOARD_TYPING` | Keyboard typing sound effect |
+      | `KEYBOARD_TYPING2` | Alternative keyboard typing sound |
+      | `bell.ogg` | Bell notification sound |
+      | `screenshot.ogg` | Screenshot capture sound |
+
+      <ParamField path="THINKING_SOUND_VOLUME" type="TEXT" default="0.8">
+      Volume level for thinking sounds (0-1 range, e.g., 0.8 for 80%).
+      </ParamField>
+
+      <ParamField path="AVATAR" type="LIST" default="OFF">
+      Select the avatar for the assistant. Choose OFF to disable or select a provider.
+      </ParamField>
+
+      | Avatar | Configuration |
+      |--------|---------------|
+      | `OFF` | No avatar |
+      | `Sandra` | `tavus:name=Sandra\|replica=r9fa0878977a\|persona=pc074769bad9` |
+      | `Steph` | `tavus:name=Steph\|replica=r9c55f9312fb\|persona=pc074769bad9` |
+      | `James` | `tavus:name=James\|replica=r70c81a0519b\|persona=pc074769bad9` |
+
+      <ParamField path="TELEPHONY_WEB_PANEL" type="LIST" default="OFF">
+      Enable telephony web panel integration. When enabled, the AI agent will send notifications to users to open the web panel.
+      </ParamField>
+
+      | Value | Description |
+      |-------|-------------|
+      | `ON` | Enable telephony web panel |
+      | `OFF` | Disable telephony web panel |
+
     </Expandable>
   </Card>
 
