@@ -11,7 +11,7 @@
 	"navigation": {
 		"tabs": [
 			{
-				"tab": "Users Guide",
+				"tab": "User Guide",
 				"groups": [
 					{
 						"group": "🚀 Getting Started",
@@ -71,15 +71,22 @@
 				]
 			},
 			{
-				"tab": "Developers Guide",
+				"tab": "Developer Guide",
 				"groups": [
 					{
 						"group": "🚀 Getting Started",
 						"pages": [
-							"developer-guide/overview",
-							"developer-guide/authentication"
+							"developer-guide/getting-started/quickstart"
+						]
+					},
+					{
+						"group": "Integration",
+						"pages": [
+							"developer-guide/api/create-job",
+							"developer-guide/mcp-tools"
 						]
 					}
+		
 				]
 			}
 		]
