@@ -1,0 +1,1090 @@
+---
+title: 'Virtual Machine Deployment'
+description: 'Deploy Agentix on virtual machines with complete production configuration'
+icon: 'server'
+---
+
+# Virtual Machine Deployment
+
+Deploy Agentix on virtual machines for full production capabilities with dedicated resources, enterprise security, and operational control.
+
+## VM Sizing and Configuration
+
+### Production VM Specifications
+
+<Tabs>
+<Tab title="Small Production (Up to 500 users)">
+**Virtual Machine Requirements:**
+- **vCPU**: 8 cores (3.0GHz+ equivalent)
+- **RAM**: 16GB DDR4
+- **Storage**: 500GB NVMe SSD
+- **Network**: 5Gbps bandwidth
+- **OS**: Ubuntu 22.04 LTS
+
+**Capacity Expectations:**
+- Active connections: 500 concurrent users
+- API requests: 2,500/second sustained
+- Voice sessions: 100 simultaneous calls
+- Storage growth: ~50GB/month
+</Tab>
+
+<Tab title="Medium Production (Up to 1,500 users)">
+**Virtual Machine Requirements:**
+- **vCPU**: 16 cores (3.0GHz+ equivalent)  
+- **RAM**: 32GB DDR4
+- **Storage**: 1TB NVMe SSD
+- **Network**: 10Gbps bandwidth
+- **OS**: Ubuntu 22.04 LTS
+
+**Capacity Expectations:**
+- Active connections: 1,500 concurrent users
+- API requests: 7,500/second sustained
+- Voice sessions: 300 simultaneous calls
+- Storage growth: ~150GB/month
+</Tab>
+
+<Tab title="Large Production (Up to 5,000+ users)">
+**Virtual Machine Requirements:**
+- **vCPU**: 32 cores (3.5GHz+ equivalent)
+- **RAM**: 64GB DDR4
+- **Storage**: 2TB NVMe SSD (RAID 1)
+- **Network**: 25Gbps bandwidth
+- **OS**: Ubuntu 22.04 LTS
+
+**Capacity Expectations:**
+- Active connections: 5,000+ concurrent users
+- API requests: 25,000/second sustained  
+- Voice sessions: 1,000+ simultaneous calls
+- Storage growth: ~500GB/month
+</Tab>
+</Tabs>
+
+### Cloud Provider VM Recommendations
+
+<CardGroup cols={2}>
+<Card title="AWS EC2 Instances" icon="aws">
+**Recommended Instance Types:**
+- **Small**: `c6i.2xlarge` (8 vCPU, 16GB RAM)
+- **Medium**: `c6i.4xlarge` (16 vCPU, 32GB RAM)
+- **Large**: `c6i.8xlarge` (32 vCPU, 64GB RAM)
+
+**Storage**: GP3 SSD with 3,000+ IOPS
+**Networking**: Enhanced networking enabled
+**Region**: Choose closest to your users
+</Card>
+
+<Card title="Google Cloud Platform" icon="google">
+**Recommended Machine Types:**
+- **Small**: `c2-standard-8` (8 vCPU, 32GB RAM)
+- **Medium**: `c2-standard-16` (16 vCPU, 64GB RAM)  
+- **Large**: `c2-standard-30` (30 vCPU, 120GB RAM)
+
+**Storage**: SSD persistent disks
+**Networking**: Tier 1 networking
+**Region**: Global load balancer support
+</Card>
+</CardGroup>
+
+---
+title: 'Virtual Machine Architecture'
+description: 'Enterprise VM specifications, multi-zone deployment patterns, and infrastructure requirements'
+icon: 'server'
+---
+
+# Virtual Machine Architecture
+
+Enterprise virtual machine specifications and multi-zone deployment patterns for production Agentix deployments.
+
+<Warning>
+VM specifications must account for peak loads, multi-zone redundancy, and enterprise compliance requirements. Size infrastructure for 2-3x expected capacity.
+</Warning>
+
+## Enterprise VM Specifications
+
+### Production Server Sizing
+
+<Tabs>
+<Tab title="Small Enterprise (500-1,000 users)">
+**Virtual Machine Requirements:**
+- **vCPU**: 8 cores (3.0GHz+ equivalent)
+- **RAM**: 16GB DDR4 ECC
+- **Storage**: 500GB NVMe SSD (RAID 1)
+- **Network**: 5Gbps dedicated bandwidth
+- **OS**: Ubuntu 22.04 LTS or RHEL 9
+
+**Capacity Planning:**
+- Active connections: 1,000 concurrent users
+- API requests: 5,000/second sustained
+- Voice/Video sessions: 200 simultaneous
+- Storage growth: ~100GB/month
+- Database IOPS: 3,000+ sustained
+
+**Enterprise Features:**
+- Hardware RAID controller
+- Redundant power supplies
+- IPMI/BMC management
+- Enterprise SSD with power-loss protection
+</Tab>
+
+<Tab title="Medium Enterprise (2,000-5,000 users)">
+**Virtual Machine Requirements:**
+- **vCPU**: 16 cores (3.2GHz+ equivalent)  
+- **RAM**: 32GB DDR4 ECC
+- **Storage**: 1TB NVMe SSD (RAID 10)
+- **Network**: 10Gbps dedicated bandwidth
+- **OS**: Ubuntu 22.04 LTS or RHEL 9
+
+**Capacity Planning:**
+- Active connections: 5,000 concurrent users
+- API requests: 15,000/second sustained
+- Voice/Video sessions: 750 simultaneous
+- Storage growth: ~300GB/month
+- Database IOPS: 10,000+ sustained
+
+**Enterprise Features:**
+- Multiple network interfaces (bonding)
+- Hot-swappable components
+- Advanced monitoring (SNMP/IPMI)
+- Enterprise backup integration
+</Tab>
+
+<Tab title="Large Enterprise (10,000+ users)">
+**Virtual Machine Requirements:**
+- **vCPU**: 32+ cores (3.5GHz+ equivalent)
+- **RAM**: 64GB+ DDR4 ECC
+- **Storage**: 2TB+ NVMe SSD (RAID 10)
+- **Network**: 25Gbps+ dedicated bandwidth
+- **OS**: Ubuntu 22.04 LTS or RHEL 9
+
+**Capacity Planning:**
+- Active connections: 10,000+ concurrent users
+- API requests: 50,000/second sustained  
+- Voice/Video sessions: 2,500+ simultaneous
+- Storage growth: ~1TB/month
+- Database IOPS: 25,000+ sustained
+
+**Enterprise Features:**
+- NUMA-aware CPU topology
+- SR-IOV network virtualization
+- Hardware-based encryption
+- Enterprise storage arrays (SAN/NAS)
+- High-availability clustering
+</Tab>
+</Tabs>
+
+### Cloud Provider VM Recommendations
+
+<CardGroup cols={2}>
+<Card title="AWS EC2 Instances" icon="aws">
+**Compute-Optimized Instances:**
+- **Small**: `c6i.2xlarge` (8 vCPU, 16GB RAM)
+- **Medium**: `c6i.4xlarge` (16 vCPU, 32GB RAM)
+- **Large**: `c6i.8xlarge` (32 vCPU, 64GB RAM)
+- **XLarge**: `c6i.12xlarge` (48 vCPU, 96GB RAM)
+
+**Storage Options:**
+- **GP3 SSD**: 3,000+ IOPS baseline, burstable
+- **io2 Block Express**: 64,000+ IOPS for databases
+- **Instance Store**: Ultra-low latency for caching
+
+**Networking:**
+- **Enhanced Networking**: SR-IOV support
+- **Placement Groups**: Low-latency cluster networking
+- **Elastic Network Adapters**: Multiple network interfaces
+</Card>
+
+<Card title="Google Cloud Platform" icon="google">
+**Machine Type Families:**
+- **C2**: `c2-standard-8/16/30` (CPU-optimized)
+- **N2**: `n2-standard-8/16/32` (Balanced performance)
+- **N2D**: AMD EPYC processors (cost-optimized)
+
+**Storage Classes:**
+- **SSD Persistent Disks**: Up to 100,000 IOPS
+- **Local SSDs**: Ultra-high performance
+- **Regional Persistent Disks**: Cross-zone replication
+
+**Networking:**
+- **Premium Tier**: Global load balancing
+- **gVNIC**: High-performance virtual networking
+- **Private Google Access**: Secure connectivity
+</Card>
+</CardGroup>
+
+<CardGroup cols={2}>
+<Card title="Microsoft Azure" icon="microsoft">
+**VM Series Recommendations:**
+- **Fsv2**: `Standard_F8s_v2/16s_v2/32s_v2`
+- **Dsv4**: `Standard_D8s_v4/16s_v4/32s_v4`
+- **Esv4**: `Standard_E8s_v4/16s_v4/32s_v4`
+
+**Storage Options:**
+- **Premium SSD**: Up to 20,000 IOPS
+- **Ultra Disks**: Up to 160,000 IOPS
+- **Managed Disks**: Built-in redundancy
+
+**Networking:**
+- **Accelerated Networking**: SR-IOV support
+- **Proximity Placement Groups**: Low latency
+- **Azure Load Balancer**: Layer 4 distribution
+</Card>
+
+<Card title="Oracle Cloud (OCI)" icon="oracle">
+**Compute Shapes:**
+- **VM.Standard3.Flex**: Flexible CPU/memory
+- **VM.DenseIO2**: High-performance storage
+- **BM.Standard2**: Bare metal for maximum performance
+
+**Storage Services:**
+- **Block Volumes**: Up to 25,000 IOPS
+- **Local NVMe**: Ultra-low latency
+- **File Storage**: Network-attached storage
+
+**Networking:**
+- **Virtual Cloud Networks**: Software-defined networking
+- **FastConnect**: Dedicated connectivity
+- **Load Balancers**: Layer 4/7 distribution
+</Card>
+</CardGroup>
+
+## Multi-Zone Enterprise Architecture
+
+### Geographic Distribution Patterns
+
+<AccordionGroup>
+<Accordion title="Single Region, Multi-AZ Deployment">
+**Architecture Overview:**
+```yaml
+Region: US-East-1
+├── Availability Zone A (Primary)
+│   ├── App Servers (2x c6i.4xlarge)
+│   ├── RTC Servers (2x c6i.2xlarge)
+│   └── Database Primary (1x r6i.2xlarge)
+├── Availability Zone B (Secondary)
+│   ├── App Servers (2x c6i.4xlarge)
+│   ├── RTC Servers (2x c6i.2xlarge)
+│   └── Database Replica (1x r6i.2xlarge)
+└── Availability Zone C (DR/Backup)
+    ├── App Server (1x c6i.2xlarge)
+    └── Database Backup (1x r6i.large)
+```
+
+**Network Requirements:**
+- **Inter-AZ Latency**: Less than 5ms (same region)
+- **Bandwidth**: 10Gbps+ between AZs
+- **Load Balancer**: Cross-AZ health checks
+- **Data Replication**: Synchronous between A&B, asynchronous to C
+
+**Failover Scenarios:**
+- **AZ Failure**: Automatic traffic shift to healthy AZs
+- **Database Failover**: Promote replica in 30-60 seconds
+- **Application Recovery**: Container orchestration handles restarts
+- **Network Isolation**: Each AZ operates independently
+</Accordion>
+
+<Accordion title="Multi-Region Enterprise Deployment">
+**Global Architecture:**
+```yaml
+Primary Region: US-East-1
+├── Production Load (70% traffic)
+├── Database Master
+└── Full service stack
+
+Secondary Region: EU-West-1  
+├── European Users (25% traffic)
+├── Database Read Replicas
+└── Regional service stack
+
+DR Region: US-West-2
+├── Disaster Recovery (5% traffic)
+├── Database Backup/Archive
+└── Minimal service stack
+```
+
+**Cross-Region Considerations:**
+- **Latency**: 100-200ms between regions
+- **Data Residency**: GDPR, regional compliance requirements
+- **Bandwidth**: 1-5Gbps dedicated inter-region links
+- **Failover Time**: 5-15 minutes for region-level failover
+- **Cost Optimization**: Varying instance types per region
+
+**Global Load Balancing:**
+- **GeoDNS**: Route users to nearest region
+- **Health Checks**: Cross-region monitoring
+- **Disaster Recovery**: Automated failover procedures
+- **Data Synchronization**: Eventually consistent cross-region replication
+</Accordion>
+
+<Accordion title="Hybrid Cloud Multi-Zone">
+**Hybrid Architecture:**
+```yaml
+On-Premises Data Center:
+├── Core Database (Compliance/Security)
+├── Internal User Traffic
+├── Legacy System Integration
+└── Private Network Connectivity
+
+Public Cloud (AWS/Azure/GCP):
+├── External User Traffic
+├── Scalable Compute Resources  
+├── Content Delivery Network
+└── Backup and DR Services
+
+Edge Locations:
+├── Regional Caching
+├── RTC Media Processing
+├── Local User Experience
+└── Reduced Latency
+```
+
+**Connectivity Requirements:**
+- **VPN/Direct Connect**: Dedicated 1-10Gbps links
+- **SD-WAN**: Software-defined networking across sites
+- **Security**: End-to-end encryption for hybrid traffic
+- **Monitoring**: Unified visibility across environments
+
+**Data Flow Patterns:**
+- **User Authentication**: Centralized identity management
+- **Media Processing**: Edge-based for performance
+- **Database Queries**: Route to appropriate data source
+- **Backup/Archive**: Cloud-based long-term storage
+</Accordion>
+</AccordionGroup>
+
+## Storage Architecture
+
+### Enterprise Storage Requirements
+
+<CardGroup cols={2}>
+<Card title="Database Storage" icon="database">
+**PostgreSQL Requirements:**
+- **IOPS**: 10,000+ sustained (enterprise workloads)
+- **Throughput**: 500MB/s+ sequential read/write
+- **Latency**: Less than 5ms average, less than 20ms 99th percentile
+- **Capacity**: 500GB-5TB+ depending on user count
+- **Redundancy**: RAID 10 or cloud equivalent
+
+**Sizing Guidelines:**
+- **Per User**: 5-10MB database storage
+- **Log Data**: 50-100MB per user per month
+- **Media Metadata**: 1-5MB per hour of content
+- **Backup Space**: 3x primary storage for retention
+</Card>
+
+<Card title="Object Storage" icon="folder-open">
+**File/Media Storage:**
+- **Type**: Object storage (S3, GCS, Azure Blob)
+- **Capacity**: Unlimited scale, pay-per-use
+- **Redundancy**: Cross-zone/region replication
+- **CDN**: Global content distribution
+- **Security**: Encryption at rest and in transit
+
+**Storage Classes:**
+- **Hot**: Frequently accessed files (API responses)
+- **Cold**: Archived recordings, compliance data
+- **Glacier**: Long-term retention, legal holds
+- **Cross-Region**: Disaster recovery copies
+</Card>
+</CardGroup>
+
+### Storage Performance Tiers
+
+<AccordionGroup>
+<Accordion title="High-Performance Tier (Database/Cache)">
+**Requirements:**
+- **Latency**: Less than 1ms for cache, less than 5ms for database
+- **IOPS**: 25,000+ for high-traffic deployments
+- **Throughput**: 1GB/s+ for data loading/backup
+- **Technology**: NVMe SSD, local instance storage
+
+**Use Cases:**
+- Redis cache and session storage
+- PostgreSQL primary database
+- Real-time analytics processing
+- Live transcription and AI processing
+
+**Redundancy:**
+- Software RAID across multiple NVMe drives
+- Real-time replication to secondary zone
+- Automated failover within 30 seconds
+- Point-in-time recovery capabilities
+</Accordion>
+
+<Accordion title="Standard Performance Tier (Applications)">
+**Requirements:**
+- **Latency**: Less than 10ms for typical operations
+- **IOPS**: 3,000-10,000 for application workloads
+- **Throughput**: 250MB/s for file operations
+- **Technology**: Premium SSD (GP3, Premium SSD v2)
+
+**Use Cases:**
+- Application binary storage
+- Configuration and log files
+- User-uploaded content processing
+- Temporary working directories
+
+**Features:**
+- Snapshot-based backups
+- Cross-zone replication available
+- Elastic scaling based on demand
+- Cost-optimized for steady workloads
+</Accordion>
+
+<Accordion title="Archive Tier (Compliance/Backup)">
+**Requirements:**
+- **Latency**: Minutes to hours (retrieval time)
+- **Cost**: Lowest per GB stored
+- **Durability**: 99.999999999% (11 9's)
+- **Technology**: Tape/Optical equivalent cloud storage
+
+**Use Cases:**
+- Regulatory compliance archives
+- Long-term backup retention
+- Legal hold requirements
+- Disaster recovery archives
+
+**Lifecycle Management:**
+- Automatic tiering based on access patterns
+- Compliance-driven retention policies
+- Encrypted storage with key management
+- Multi-region replication for durability
+</Accordion>
+</AccordionGroup>
+
+## Network Architecture
+
+### Enterprise Network Design
+
+<CardGroup cols={2}>
+<Card title="Network Segmentation" icon="network-wired">
+**DMZ (Public Zone):**
+- Load balancers and reverse proxies
+- Web application firewalls (WAF)
+- DDoS protection services
+- Public SSL termination
+
+**Application Zone:**
+- Agentix application servers
+- Container orchestration (if used)
+- Internal service mesh
+- Application-level security
+
+**Data Zone:**
+- Database servers (primary/replica)
+- Redis cache clusters
+- Backup and monitoring systems
+- Encrypted internal communications
+
+**Management Zone:**
+- Administrative access systems
+- Monitoring and logging servers
+- Configuration management
+- VPN/bastion host access
+</Card>
+
+<Card title="Connectivity Requirements" icon="globe">
+**External Connectivity:**
+- **Internet**: 10-100Gbps+ depending on user base
+- **CDN**: Multi-provider for global reach
+- **DNS**: Anycast DNS with health checks
+- **DDoS Protection**: Cloud-based scrubbing
+
+**Internal Connectivity:**
+- **East-West Traffic**: 25Gbps+ between zones
+- **Database Replication**: Dedicated 10Gbps links
+- **Backup Traffic**: Separate network for backups
+- **Management**: Out-of-band management network
+
+**Multi-Site Connectivity:**
+- **MPLS/SD-WAN**: 1-10Gbps inter-site links
+- **VPN Backup**: Redundant connectivity options
+- **Direct Connect**: Dedicated cloud connectivity
+- **Satellite Backup**: Remote site connectivity
+</Card>
+</CardGroup>
+
+### Performance and Latency Requirements
+
+<AccordionGroup>
+<Accordion title="Real-Time Communication (RTC)">
+**Latency Requirements:**
+- **Voice Quality**: Less than 150ms end-to-end
+- **Video Quality**: Less than 200ms end-to-end  
+- **Interactive Sessions**: Less than 100ms server processing
+- **Screen Sharing**: Less than 300ms for acceptable experience
+
+**Bandwidth Planning:**
+- **Voice**: 64kbps per concurrent call
+- **Video**: 500kbps-2Mbps per stream (quality dependent)
+- **Screen Share**: 1-10Mbps per session
+- **Overhead**: 20-30% for packet headers and retransmission
+
+**Network Optimization:**
+- **QoS**: Priority queuing for real-time traffic
+- **Traffic Shaping**: Bandwidth allocation per application type
+- **DSCP Marking**: End-to-end quality of service
+- **Jitter Buffers**: Adaptive buffering for audio/video
+</Accordion>
+
+<Accordion title="API and Web Performance">
+**Response Time Targets:**
+- **Authentication**: Less than 200ms (95th percentile)
+- **Data Retrieval**: Less than 100ms (typical queries)
+- **Data Modification**: Less than 500ms (complex operations)
+- **File Uploads**: Progress feedback every 1-2 seconds
+
+**Throughput Requirements:**
+- **Concurrent Connections**: 1,000+ per server
+- **Requests per Second**: 5,000+ sustained per server
+- **WebSocket Connections**: 10,000+ per server
+- **SSL Handshakes**: 500+ new connections per second
+
+**Optimization Strategies:**
+- **Connection Pooling**: Reduce database connection overhead
+- **Content Compression**: Gzip/Brotli for text-based content
+- **HTTP/2**: Multiplexed connections for efficiency
+- **Edge Caching**: CDN for static content delivery
+</Accordion>
+</AccordionGroup>
+
+## Security Architecture
+
+### VM-Level Security
+
+<CardGroup cols={2}>
+<Card title="Operating System Hardening" icon="shield">
+**Security Baselines:**
+- **CIS Benchmarks**: Industry-standard hardening guides
+- **STIG Compliance**: DoD security requirements (if applicable)
+- **Minimal Installation**: Remove unnecessary packages/services
+- **Security Updates**: Automated patching with controlled rollout
+
+**Access Control:**
+- **SSH Key Authentication**: No password-based login
+- **Multi-Factor Authentication**: Required for administrative access
+- **Privilege Escalation**: sudo with logging and approval workflows
+- **Session Recording**: Audit trails for administrative actions
+
+**Network Security:**
+- **Host Firewall**: iptables/nftables with restrictive rules
+- **Intrusion Detection**: HIDS monitoring for file/system changes
+- **Log Forwarding**: Centralized security event collection
+- **Vulnerability Scanning**: Regular security assessment automation
+</Card>
+
+<Card title="Application Security" icon="lock">
+**Container Security (if applicable):**
+- **Image Scanning**: Vulnerability assessment of container images
+- **Runtime Security**: Monitoring for anomalous container behavior
+- **Network Policies**: Microsegmentation between containers
+- **Secrets Management**: Encrypted storage of sensitive configuration
+
+**Application Hardening:**
+- **Non-Root Execution**: Applications run with minimal privileges
+- **File Permissions**: Restrictive access to configuration/data files
+- **Resource Limits**: CPU/memory limits to prevent resource exhaustion
+- **Security Headers**: HTTPS, HSTS, CSP headers for web interfaces
+
+**Data Protection:**
+- **Encryption at Rest**: Database and file system encryption
+- **Encryption in Transit**: TLS 1.3 for all network communications
+- **Key Management**: HSM or cloud-based key management services
+- **Data Classification**: Handling based on sensitivity levels
+</Card>
+</CardGroup>
+
+### Compliance Frameworks
+
+<AccordionGroup>
+<Accordion title="SOC 2 Type II Compliance">
+**Security Controls:**
+- **Access Controls**: Multi-factor authentication, role-based access
+- **System Monitoring**: Continuous security monitoring and alerting
+- **Data Protection**: Encryption, backup, and recovery procedures
+- **Vendor Management**: Third-party security assessment processes
+
+**Operational Controls:**
+- **Change Management**: Controlled deployment procedures
+- **Incident Response**: Security incident handling procedures
+- **Business Continuity**: Disaster recovery and backup testing
+- **Documentation**: Security policies and procedure documentation
+
+**Monitoring Requirements:**
+- **Log Retention**: 1-7 years depending on data type
+- **Audit Trails**: Comprehensive logging of security events
+- **Performance Monitoring**: System availability and response times
+- **Compliance Reporting**: Regular security assessment reports
+</Accordion>
+
+<Accordion title="GDPR/Privacy Compliance">
+**Data Protection Requirements:**
+- **Data Minimization**: Collect only necessary personal data
+- **Right to Deletion**: Ability to permanently remove user data
+- **Data Portability**: Export user data in standard formats
+- **Consent Management**: Granular consent tracking and management
+
+**Technical Safeguards:**
+- **Pseudonymization**: De-identification of personal data
+- **Access Logging**: Track all access to personal data
+- **Data Encryption**: Strong encryption for personal data
+- **Cross-Border Transfer**: Appropriate safeguards for international transfers
+
+**Regional Considerations:**
+- **Data Residency**: EU data stored within EU boundaries
+- **Local Representatives**: GDPR representative in applicable jurisdictions
+- **Breach Notification**: 72-hour notification requirements
+- **Data Protection Officer**: Designated privacy compliance officer
+</Accordion>
+
+<Accordion title="Industry-Specific Compliance">
+**Healthcare (HIPAA/HITECH):**
+- **PHI Protection**: Encryption and access controls for health data
+- **Business Associate Agreements**: Vendor compliance requirements
+- **Audit Trails**: Detailed logging of PHI access and modifications
+- **Risk Assessments**: Regular security risk assessments
+
+**Financial Services (PCI DSS):**
+- **Network Segmentation**: Isolated cardholder data environment
+- **Vulnerability Management**: Regular scanning and remediation
+- **Access Controls**: Strict authentication and authorization requirements
+- **Monitoring**: Real-time monitoring of cardholder data access
+
+**Government (FedRAMP/FISMA):**
+- **Authority to Operate**: Government authorization requirements
+- **Continuous Monitoring**: Ongoing security assessment requirements
+- **Supply Chain Security**: Vendor and component security verification
+- **Incident Reporting**: Government incident notification requirements
+</Accordion>
+</AccordionGroup>
+
+## Monitoring and Observability
+
+### Infrastructure Monitoring
+
+<CardGroup cols={2}>
+<Card title="System Metrics" icon="chart-line">
+**VM Performance Monitoring:**
+- **CPU Utilization**: Per-core utilization, load averages
+- **Memory Usage**: RAM utilization, swap usage, memory leaks
+- **Disk I/O**: IOPS, throughput, latency, queue depth
+- **Network**: Throughput, packet loss, connection counts
+
+**Application Metrics:**
+- **Process Monitoring**: CPU/memory per process
+- **Service Health**: Application-specific health checks
+- **Database Performance**: Query performance, connection pools
+- **Cache Efficiency**: Redis hit/miss ratios, memory usage
+
+**Custom Metrics:**
+- **Business KPIs**: Active users, session duration
+- **Service Level Metrics**: API response times, error rates
+- **Capacity Planning**: Resource utilization trends
+- **Security Events**: Failed authentication, suspicious activity
+</Card>
+
+<Card title="Log Management" icon="file-text">
+**Log Collection Strategy:**
+- **Centralized Logging**: All logs forwarded to central system
+- **Log Parsing**: Structured logging with JSON formatting
+- **Log Retention**: Configurable retention based on log type
+- **Log Analysis**: Real-time analysis and alerting
+
+**Log Sources:**
+- **System Logs**: syslog, kernel messages, audit logs
+- **Application Logs**: Agentix application and service logs
+- **Security Logs**: Authentication, authorization, firewall logs
+- **Performance Logs**: HTTP access logs, database slow queries
+
+**Alerting Configuration:**
+- **Threshold-Based**: CPU, memory, disk space alerts
+- **Anomaly Detection**: Unusual patterns in metrics/logs
+- **Composite Alerts**: Multiple condition-based alerting
+- **Escalation Procedures**: Alert routing and escalation workflows
+</Card>
+</CardGroup>
+
+### Performance Baselines
+
+<AccordionGroup>
+<Accordion title="VM Performance Baselines">
+**CPU Performance:**
+- **Utilization**: Less than 70% average, Less than 90% peak
+- **Load Average**: Less than number of cores
+- **Context Switches**: Monitor for excessive switching
+- **CPU Wait**: Less than 5% I/O wait under normal conditions
+
+**Memory Performance:**
+- **Utilization**: Less than 80% physical memory usage
+- **Swap Usage**: Less than 1GB swap usage under normal conditions
+- **Page Faults**: Monitor for excessive paging
+- **Buffer/Cache**: Efficient use of available memory
+
+**Storage Performance:**
+- **IOPS**: Baseline measurements per storage type
+- **Latency**: Less than 10ms for application storage, Less than 1ms for cache
+- **Throughput**: Sustained vs. burst performance baselines
+- **Queue Depth**: Optimal queue depth for storage type
+
+**Network Performance:**
+- **Throughput**: Baseline bandwidth utilization
+- **Latency**: Inter-service communication baselines
+- **Packet Loss**: Less than 0.1% under normal conditions
+- **Connection Counts**: Baseline concurrent connections
+</Accordion>
+
+<Accordion title="Application Performance Baselines">
+**API Response Times:**
+- **Authentication**: Less than 200ms (95th percentile)
+- **User Data**: Less than 100ms (typical queries)
+- **Complex Operations**: Less than 1000ms (reporting, analytics)
+- **File Operations**: Progress feedback every 2 seconds
+
+**Database Performance:**
+- **Query Response Time**: Less than 50ms (simple queries)
+- **Connection Pool**: Less than 100 active connections typically
+- **Replication Lag**: Less than 1 second under normal load
+- **Lock Contention**: Minimal lock wait events
+
+**Real-Time Communication:**
+- **Connection Establishment**: Less than 500ms
+- **Media Latency**: Less than 150ms end-to-end
+- **Concurrent Sessions**: Baseline capacity per server
+- **Quality Metrics**: Packet loss Less than 1%, jitter Less than 30ms
+</Accordion>
+</AccordionGroup>
+
+## Disaster Recovery
+
+### VM-Level Backup Strategies
+
+<CardGroup cols={2}>
+<Card title="VM Snapshot Management" icon="camera">
+**Snapshot Strategy:**
+- **Frequency**: Daily snapshots, weekly full backups
+- **Retention**: 7 daily, 4 weekly, 12 monthly snapshots
+- **Consistency**: Application-consistent snapshots when possible
+- **Automation**: Scheduled snapshots with automated cleanup
+
+**Cross-Region Replication:**
+- **Primary Backup**: Same region, different availability zone
+- **DR Backup**: Different region for disaster recovery
+- **Bandwidth**: Dedicated bandwidth for backup traffic
+- **Encryption**: All backups encrypted in transit and at rest
+
+**Recovery Procedures:**
+- **RTO**: 2-hour recovery time objective for full VM restore
+- **RPO**: 24-hour recovery point objective maximum
+- **Testing**: Monthly DR tests with documented procedures
+- **Automation**: Scripted recovery procedures where possible
+</Card>
+
+<Card title="Data-Level Backup" icon="database">
+**Database Backup Strategy:**
+- **Full Backups**: Weekly full database backups
+- **Incremental**: Hourly incremental backups
+- **Transaction Log**: Continuous transaction log backups
+- **Cross-Region**: Daily backup replication to DR region
+
+**Application Data Backup:**
+- **Configuration**: Version-controlled configuration management
+- **User Content**: Real-time replication to object storage
+- **Logs**: Centralized log collection with retention policies
+- **SSL Certificates**: Secure backup of certificates and keys
+
+**Backup Validation:**
+- **Integrity Checks**: Automated backup verification
+- **Test Restores**: Monthly test restores to validate backups
+- **Recovery Drills**: Quarterly full disaster recovery exercises
+- **Documentation**: Updated recovery procedures and contact lists
+</Card>
+</CardGroup>
+
+## Capacity Planning
+
+### Growth Projections
+
+<AccordionGroup>
+<Accordion title="User Growth Planning">
+**Growth Scenarios:**
+- **Conservative**: 20% annual user growth
+- **Moderate**: 50% annual user growth  
+- **Aggressive**: 100%+ annual user growth
+- **Seasonal**: Peak usage patterns and capacity planning
+
+**Resource Scaling:**
+- **CPU**: Linear scaling with concurrent users
+- **Memory**: 1.5x scaling due to caching and session data
+- **Storage**: 2x scaling for historical data and media
+- **Network**: 1.8x scaling for higher quality media
+
+**Scaling Triggers:**
+- **CPU Utilization**: Scale when >70% sustained
+- **Memory Usage**: Scale when >80% utilization
+- **Response Time**: Scale when >95th percentile degrades
+- **Error Rates**: Scale when error rates increase above baseline
+</Accordion>
+
+<Accordion title="Cost Optimization">
+**Right-Sizing Strategy:**
+- **Periodic Review**: Monthly resource utilization analysis
+- **Instance Types**: Optimize for workload characteristics
+- **Reserved Capacity**: 1-3 year commitments for predictable workloads
+- **Spot Instances**: Non-critical workloads on spot/preemptible instances
+
+**Multi-Cloud Strategy:**
+- **Cost Comparison**: Regular pricing analysis across providers
+- **Workload Placement**: Optimize workload placement for cost
+- **Regional Optimization**: Leverage regional pricing differences
+- **Commitment Management**: Optimize reserved instance utilization
+
+**Operational Efficiency:**
+- **Automation**: Reduce operational overhead through automation
+- **Monitoring**: Proactive monitoring to prevent issues
+- **DevOps**: Efficient deployment and management processes
+- **Training**: Staff training to improve operational efficiency
+</Accordion>
+</AccordionGroup>
+
+## Next Steps
+
+<CardGroup cols={2}>
+<Card title="Kubernetes Architecture" icon="dharmachakra" href="/developer-guide/self-hosting/kubernetes">
+  Explore container orchestration for enterprise scalability
+</Card>
+
+<Card title="Network Configuration" icon="shield" href="/developer-guide/self-hosting/network-firewall">
+  Configure firewall rules and network security policies
+</Card>
+</CardGroup>
+
+<CardGroup cols={2}>
+<Card title="Deployment Architecture" icon="rocket" href="/developer-guide/self-hosting/deployment">
+  Review production deployment patterns and SSL configuration
+</Card>
+
+<Card title="Performance Benchmarks" icon="chart-line" href="/developer-guide/self-hosting/benchmarks">
+  Understand capacity planning and performance expectations
+</Card>
+</CardGroup>
+
+# Restart Docker to apply changes
+sudo systemctl restart docker
+```
+</CodeGroup>
+
+## Production Deployment
+
+### All-in-One VM Deployment
+
+Complete production setup on a single VM:
+
+<CodeGroup>
+```yaml docker-compose.yml
+version: '3.8'
+
+services:
+  agentix:
+    image: agentixhub/agentix:latest
+    container_name: agentix-server
+    restart: unless-stopped
+    ports:
+      - "7880:7880"      # API & Web UI
+      - "7881:7881"      # RTC TCP
+      - "50000-60000:50000-60000/udp"  # RTC UDP
+    environment:
+      # Core configuration
+      - AGENTIX_CONFIG_PATH=/etc/agentix/config.yaml
+      - AGENTIX_EXTERNAL_URL=${EXTERNAL_URL}
+      - AGENTIX_LOG_LEVEL=${LOG_LEVEL:-info}
+      
+      # Database
+      - POSTGRES_HOST=postgres
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      
+      # Redis
+      - REDIS_HOST=redis
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+      
+      # Security
+      - AGENTIX_API_KEY=${AGENTIX_API_KEY}
+      - AGENTIX_JWT_SECRET=${JWT_SECRET}
+      
+    volumes:
+      - ./config:/etc/agentix:ro
+      - agentix-data:/var/lib/agentix
+      - agentix-logs:/var/log/agentix
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:7880/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    deploy:
+      resources:
+        limits:
+          memory: 8G
+        reservations:
+          memory: 4G
+
+  postgres:
+    image: postgres:15-alpine
+    container_name: agentix-postgres
+    restart: unless-stopped
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_INITDB_ARGS=--data-checksums
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./backups:/backups
+      - ./postgres-init:/docker-entrypoint-initdb.d:ro
+    ports:
+      - "127.0.0.1:5432:5432"
+    command: |
+      postgres
+        -c shared_preload_libraries=pg_stat_statements
+        -c pg_stat_statements.track=all
+        -c max_connections=200
+        -c shared_buffers=256MB
+        -c effective_cache_size=1GB
+        -c maintenance_work_mem=64MB
+        -c checkpoint_completion_target=0.9
+        -c wal_buffers=16MB
+        -c default_statistics_target=100
+        -c random_page_cost=1.1
+        -c effective_io_concurrency=200
+        -c work_mem=4MB
+        -c min_wal_size=1GB
+        -c max_wal_size=4GB
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    deploy:
+      resources:
+        limits:
+          memory: 4G
+        reservations:
+          memory: 2G
+
+  redis:
+    image: redis:7-alpine
+    container_name: agentix-redis
+    restart: unless-stopped
+    command: >
+      redis-server
+        --requirepass ${REDIS_PASSWORD}
+        --appendonly yes
+        --appendfsync everysec
+        --auto-aof-rewrite-percentage 100
+        --auto-aof-rewrite-min-size 64mb
+        --maxmemory 2gb
+        --maxmemory-policy allkeys-lru
+        --timeout 0
+        --tcp-keepalive 300
+    volumes:
+      - redis-data:/data
+      - ./redis.conf:/usr/local/etc/redis/redis.conf:ro
+    ports:
+      - "127.0.0.1:6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "--no-auth-warning", "-a", "${REDIS_PASSWORD}", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+      start_period: 30s
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+        reservations:
+          memory: 1G
+
+  # Nginx reverse proxy with SSL
+  nginx:
+    image: nginx:alpine
+    container_name: agentix-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl-certs:/etc/ssl/certs:ro
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+      - nginx-logs:/var/log/nginx
+    depends_on:
+      - agentix
+    healthcheck:
+      test: ["CMD", "nginx", "-t"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Backup service
+  backup:
+    image: agentixhub/backup:latest
+    container_name: agentix-backup
+    restart: unless-stopped
+    environment:
+      - POSTGRES_HOST=postgres
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - S3_BUCKET=${BACKUP_S3_BUCKET}
+      - S3_REGION=${BACKUP_S3_REGION}
+      - AWS_ACCESS_KEY_ID=${BACKUP_AWS_ACCESS_KEY}
+      - AWS_SECRET_ACCESS_KEY=${BACKUP_AWS_SECRET_KEY}
+    volumes:
+      - agentix-data:/data/agentix:ro
+      - postgres-data:/data/postgres:ro
+      - ./backups:/backups
+    depends_on:
+      - postgres
+    profiles:
+      - backup
+
+volumes:
+  agentix-data:
+  agentix-logs:
+  postgres-data:
+  redis-data:
+  nginx-logs:
+
+networks:
+  default:
+    driver: bridge
+    ipam:
+      config:
+## Next Steps
+
+<CardGroup cols={2}>
+<Card title="Kubernetes Architecture" icon="dharmachakra" href="/developer-guide/self-hosting/kubernetes">
+  Explore container orchestration for enterprise scalability
+</Card>
+
+<Card title="Network Configuration" icon="shield" href="/developer-guide/self-hosting/network-firewall">
+  Configure firewall rules and network security policies
+</Card>
+</CardGroup>
+
+<CardGroup cols={2}>
+<Card title="Deployment Architecture" icon="rocket" href="/developer-guide/self-hosting/deployment">
+  Review production deployment patterns and SSL configuration
+</Card>
+
+<Card title="Performance Benchmarks" icon="chart-line" href="/developer-guide/self-hosting/benchmarks">
+  Understand capacity planning and performance expectations
+</Card>
+</CardGroup>

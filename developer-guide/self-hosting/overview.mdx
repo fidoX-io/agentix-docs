@@ -1,0 +1,798 @@
+---
+title: 'Self-Hosting Overview'
+description: 'Architecture planning, system requirements, and deployment considerations for Agentix'
+icon: 'server'
+---
+
+# Self-Hosting Agentix
+
+Plan and architect your Agentix deployment with confidence. This guide covers system requirements, architecture patterns, and essential considerations for enterprise-grade self-hosting.
+
+<Warning>
+Self-hosting requires careful planning of system requirements, network architecture, and security considerations. Review all sections before proceeding with deployment.
+</Warning>
+
+## Architecture Patterns
+
+### Single-Zone Deployments
+
+<CardGroup cols={2}>
+<Card title="Standalone Server" icon="server">
+  **Best for**: Development, testing, small teams (&lt;100 users)
+  
+  **Architecture**:
+  - Single server with all components
+  - Local database and cache
+  - Basic load balancing
+  - Standard firewall configuration
+  
+  **Limitations**:
+  - Single point of failure
+  - Limited scaling options
+  - Regional performance constraints
+</Card>
+
+<Card title="Distributed Single-Zone" icon="network-wired">
+  **Best for**: Production deployments (&lt;1,000 users)
+  
+  **Architecture**:
+  - Separate application and database servers
+  - Dedicated cache layer
+  - Load balancer with SSL termination
+  - Advanced firewall segmentation
+  
+  **Benefits**:
+  - Independent scaling of components
+  - Better fault isolation
+  - Performance optimization per service
+</Card>
+</CardGroup>
+
+### Enterprise Multi-Zone Architecture
+
+For enterprise deployments requiring high availability, global distribution, and regulatory compliance:
+
+```yaml
+┌─────────────────────────────────────────────────────────┐
+│                    Global Load Balancer                │
+│                   (DNS-based routing)                  │
+└─────────────────────┬───────────────────────────────────┘
+                      │
+        ┌─────────────┼─────────────┐
+        │             │             │
+   ┌────▼────┐   ┌────▼────┐   ┌────▼────┐
+   │ Zone A  │   │ Zone B  │   │ Zone C  │
+   │ Primary │   │ Active  │   │ DR/Cold │
+   └─────────┘   └─────────┘   └─────────┘
+```
+
+<AccordionGroup>
+<Accordion title="Multi-Zone Components">
+**Zone A - Primary Region:**
+- Primary database cluster (read/write)
+- Full application stack
+- Real-time data processing
+- Primary user traffic
+
+**Zone B - Active Secondary:**
+- Read replica databases
+- Full application stack
+- Automated failover capability
+- Regional user traffic
+
+**Zone C - Disaster Recovery:**
+- Cold standby infrastructure
+- Backup storage systems
+- Emergency activation procedures
+- Data replication target
+</Accordion>
+
+<Accordion title="Inter-Zone Communication">
+**Database Replication:**
+- Streaming replication for real-time sync
+- Point-in-time recovery capabilities
+- Cross-zone backup validation
+
+**Application Synchronization:**
+- Session state replication
+- Configuration synchronization
+- Asset and media distribution
+
+**Network Requirements:**
+- Dedicated private connectivity (VPN/MPLS)
+- Minimum 1Gbps inter-zone bandwidth
+- &lt;50ms latency between zones
+</Accordion>
+</AccordionGroup>
+
+## System Requirements
+
+### Hardware Specifications
+
+<Tabs>
+<Tab title="Small Scale (Up to 500 users)">
+**Single Server Requirements:**
+- **CPU**: 8 cores (3.0GHz+ Intel/AMD)
+- **RAM**: 16GB DDR4 ECC
+- **Storage**: 500GB NVMe SSD (enterprise grade)
+- **Network**: 5Gbps dedicated connection
+- **Redundancy**: UPS, RAID 1 for OS
+
+**Recommended Specs:**
+- **CPU**: Intel Xeon or AMD EPYC
+- **RAM**: 32GB for headroom
+- **Storage**: 2x 1TB NVMe in RAID 1
+- **Network**: Dual 10Gbps NICs
+</Tab>
+
+<Tab title="Medium Scale (500-2,000 users)">
+**Application Server:**
+- **CPU**: 16 cores (3.5GHz+)
+- **RAM**: 32GB DDR4 ECC
+- **Storage**: 1TB NVMe SSD
+- **Network**: 10Gbps dedicated
+
+**Database Server:**
+- **CPU**: 16 cores (optimized for database)
+- **RAM**: 64GB DDR4 ECC
+- **Storage**: 2TB NVMe SSD RAID 10
+- **Network**: 10Gbps dedicated
+
+**Load Balancer/Proxy:**
+- **CPU**: 8 cores
+- **RAM**: 16GB DDR4
+- **Network**: 25Gbps (high throughput)
+</Tab>
+
+<Tab title="Enterprise Scale (2,000+ users)">
+**Per-Zone Requirements:**
+
+**Application Tier (3+ servers):**
+- **CPU**: 32+ cores per server
+- **RAM**: 64GB+ per server
+- **Storage**: 1TB NVMe per server
+- **Network**: 25Gbps per server
+
+**Database Tier:**
+- **Primary**: 32 cores, 128GB RAM, 4TB storage
+- **Replicas**: 16 cores, 64GB RAM, 4TB storage
+- **Storage**: Enterprise SAN with 10K+ IOPS
+
+**Infrastructure Services:**
+- **Load Balancers**: 2+ redundant units
+- **Monitoring**: Dedicated monitoring cluster
+- **Backup Systems**: Separate backup infrastructure
+</Tab>
+</Tabs>
+
+### Software Prerequisites
+
+<CardGroup cols={2}>
+<Card title="Operating System" icon="linux">
+**Supported Platforms:**
+- Ubuntu 22.04 LTS (recommended)
+- RHEL 8.6+ / Rocky Linux 8.6+
+- CentOS Stream 8+
+- Debian 11+
+
+**Requirements:**
+- 64-bit architecture
+- Kernel 5.4+
+- systemd service manager
+- Container runtime support
+</Card>
+
+<Card title="Container Platform" icon="docker">
+**Container Runtime:**
+- Docker Engine 24.0+ (recommended)
+- containerd 1.7+
+- Podman 4.0+ (RHEL environments)
+
+**Orchestration (Optional):**
+- Kubernetes 1.28+
+- Docker Swarm
+- OpenShift 4.12+
+
+**Registry Access:**
+- Access to Docker Hub or private registry
+- Pull permissions for Agentix images
+</Card>
+</CardGroup>
+
+### Network Requirements
+
+<AccordionGroup>
+<Accordion title="Bandwidth Requirements">
+**Per User Concurrent Load:**
+- **API Traffic**: 50KB/s average, 200KB/s peak
+- **WebSocket**: 10KB/s sustained
+- **Voice Calls**: 64kbps (Opus codec)
+- **File Transfers**: Variable, up to 10MB/file
+
+**Scaling Calculations:**
+- 100 users: ~10Mbps sustained, 40Mbps peak
+- 500 users: ~50Mbps sustained, 200Mbps peak
+- 1,000 users: ~100Mbps sustained, 400Mbps peak
+- 5,000+ users: 500Mbps+ sustained, 2Gbps+ peak
+</Accordion>
+
+<Accordion title="Latency Requirements">
+**Internal Communications:**
+- **Database queries**: &lt;5ms local, &lt;20ms cross-zone
+- **Cache operations**: &lt;1ms local, &lt;10ms cross-zone
+- **Service mesh**: &lt;2ms between services
+- **Load balancer**: &lt;5ms request routing
+
+**External Communications:**
+- **API responses**: &lt;100ms to end users
+- **WebSocket messages**: &lt;50ms real-time
+- **Voice calls**: &lt;150ms end-to-end
+- **File downloads**: Based on bandwidth, not latency-critical
+</Accordion>
+
+<Accordion title="DNS and Service Discovery">
+**DNS Requirements:**
+- **Primary domain**: Agentix web interface
+- **API subdomain**: RESTful API endpoints
+- **WebSocket subdomain**: Real-time connections
+- **CDN integration**: Static asset delivery
+
+**Internal DNS:**
+- **Service discovery**: For microservices architecture
+- **Health checking**: Automated failover support
+- **Geographic routing**: Multi-zone deployments
+</Accordion>
+</AccordionGroup>
+
+## Security and Compliance
+
+### Enterprise Security Requirements
+
+<CardGroup cols={2}>
+<Card title="Network Security" icon="shield">
+**Firewall Architecture:**
+- DMZ for public-facing services
+- Application zone isolation
+- Database security zones
+- Management network separation
+
+**Required Protocols:**
+- HTTPS/TLS 1.3 for all web traffic
+- WSS for WebSocket connections
+- DTLS for voice communication
+- SSH for administrative access
+</Card>
+
+<Card title="Data Protection" icon="lock">
+**Encryption Requirements:**
+- **Data at rest**: AES-256 encryption
+- **Data in transit**: TLS 1.3 minimum
+- **Database**: Transparent data encryption
+- **Backups**: Encrypted backup storage
+
+**Key Management:**
+- Hardware Security Modules (HSM)
+- Key rotation policies
+- Secure key distribution
+- Certificate lifecycle management
+</Card>
+</CardGroup>
+
+### Compliance Considerations
+
+<AccordionGroup>
+<Accordion title="Regulatory Compliance">
+**Data Residency:**
+- Geographic data storage requirements
+- Cross-border data transfer restrictions
+- Local processing mandates
+- Audit trail maintenance
+
+**Industry Standards:**
+- **Healthcare**: HIPAA compliance readiness
+- **Finance**: PCI DSS requirements
+- **Government**: FedRAMP considerations
+- **International**: GDPR compliance support
+</Accordion>
+
+<Accordion title="Audit and Monitoring">
+**Logging Requirements:**
+- **Security events**: Authentication, authorization
+- **System events**: Service starts, stops, failures
+- **User activities**: API calls, data access
+- **Administrative actions**: Configuration changes
+
+**Retention Policies:**
+- **Security logs**: 2+ years retention
+- **Audit trails**: Compliance-driven retention
+- **Performance data**: 90+ days for optimization
+- **Backup verification**: Regular restore testing
+</Accordion>
+</AccordionGroup>
+
+## Capacity Planning
+
+### Growth Projections
+
+<CardGroup cols={2}>
+<Card title="User Growth Scaling" icon="chart-line">
+**Scaling Patterns:**
+- **Linear scaling**: API and WebSocket connections
+- **Exponential scaling**: Database queries and storage
+- **Burst scaling**: File uploads and processing
+- **Geographic scaling**: Multi-zone user distribution
+
+**Planning Horizons:**
+- **6 months**: 2x current capacity
+- **12 months**: 5x current capacity
+- **24 months**: 10x with architecture evolution
+</Card>
+
+<Card title="Resource Utilization" icon="gauge">
+**Target Utilization:**
+- **CPU**: 60-70% sustained, 85% peak
+- **Memory**: 70-80% utilization
+- **Storage**: 70% capacity with growth buffer
+- **Network**: 60% sustained, 80% peak
+
+**Scaling Triggers:**
+- **CPU**: &gt;75% for 15+ minutes
+- **Memory**: &gt;85% utilization
+- **Storage**: &gt;80% capacity
+- **Response time**: &gt;200ms API latency
+</Card>
+</CardGroup>
+
+### Resource Monitoring
+
+<AccordionGroup>
+<Accordion title="Performance Metrics">
+**Application Metrics:**
+- Request throughput and latency
+- Active user connections
+- Database query performance
+- Cache hit ratios
+- Error rates and types
+
+**System Metrics:**
+- CPU utilization per core
+- Memory usage and allocation
+- Disk I/O and queue depth
+- Network throughput and errors
+- Storage capacity and growth
+</Accordion>
+
+<Accordion title="Business Metrics">
+**Usage Analytics:**
+- Active users per time period
+- Feature adoption rates
+- Geographic distribution
+- Peak usage patterns
+- Seasonal variations
+
+**Capacity Metrics:**
+- Users per server capacity
+- Database transaction capacity
+- Storage growth rates
+- Bandwidth consumption patterns
+</Accordion>
+</AccordionGroup>
+
+## Pre-Deployment Checklist
+
+### Infrastructure Readiness
+
+<AccordionGroup>
+<Accordion title="Hardware and Network">
+- [ ] **Servers provisioned** with specified requirements
+- [ ] **Network connectivity** tested between all zones
+- [ ] **Firewall rules** configured and tested
+- [ ] **Load balancers** configured with health checks
+- [ ] **DNS configuration** completed and propagated
+- [ ] **SSL certificates** obtained and installed
+- [ ] **Monitoring systems** deployed and configured
+- [ ] **Backup systems** configured and tested
+</Accordion>
+
+<Accordion title="Security and Compliance">
+- [ ] **Security zones** properly segmented
+- [ ] **Access controls** implemented and tested
+- [ ] **Encryption** configured for data at rest and transit
+- [ ] **Audit logging** enabled and forwarded
+- [ ] **Compliance requirements** reviewed and addressed
+- [ ] **Disaster recovery** procedures documented and tested
+- [ ] **Incident response** procedures established
+- [ ] **Security scanning** completed
+</Accordion>
+</AccordionGroup>
+
+### Operational Readiness
+
+<AccordionGroup>
+<Accordion title="Team and Procedures">
+- [ ] **Operations team** trained on Agentix architecture
+- [ ] **Monitoring playbooks** created and reviewed
+- [ ] **Escalation procedures** documented
+- [ ] **Backup and recovery** procedures tested
+- [ ] **Update procedures** documented and tested
+- [ ] **Performance baselines** established
+- [ ] **Capacity planning** models created
+- [ ] **Documentation** complete and accessible
+</Accordion>
+</AccordionGroup>
+
+## Next Steps
+
+<CardGroup cols={2}>
+<Card title="Architecture Planning" icon="sitemap" href="/developer-guide/self-hosting/vm">
+  Design your specific deployment architecture based on scale and requirements
+</Card>
+
+<Card title="Firewall Configuration" icon="shield" href="/developer-guide/self-hosting/network-firewall">
+  Configure essential network security and firewall rules for your environment
+</Card>
+</CardGroup>
+
+<CardGroup cols={2}>
+<Card title="Performance Benchmarks" icon="chart-line" href="/developer-guide/self-hosting/benchmarks">
+  Review expected performance characteristics for capacity validation
+</Card>
+
+<Card title="Deployment Guide" icon="rocket" href="/developer-guide/self-hosting/deployment">
+  Proceed with actual deployment once planning is complete
+</Card>
+</CardGroup>
+cd agentix-server
+
+# Start server
+./agentix-server --config config/local.yaml
+```
+</CodeGroup>
+
+After starting, Agentix will be available at:
+- **Web Interface**: `http://localhost:7880`
+- **API Endpoint**: `http://localhost:7880/api`
+- **WebSocket**: `ws://localhost:7880/ws`
+
+<Tip>
+**First Time Setup**: Visit `http://localhost:7880/setup` to create your admin account and configure basic settings.
+</Tip>
+
+## Local Configuration
+
+### Basic Configuration File
+
+Create a `config.yaml` file for local customization:
+
+```yaml
+# Basic local configuration
+server:
+  host: "0.0.0.0"  # Allow external access
+  port: 7880
+  
+# Database (embedded SQLite for local use)
+database:
+  type: sqlite
+  path: /var/lib/agentix/agentix.db
+  
+# Redis (embedded for local use)  
+redis:
+  embedded: true
+  data_dir: /var/lib/agentix/redis
+
+# RTC Configuration
+rtc:
+  enabled: true
+  tcp_port: 7881
+  port_range_start: 50000
+  port_range_end: 60000
+  # Set to your external IP if accessing from other machines
+  external_ip: auto
+  
+# Logging
+logging:
+  level: info
+  file: /var/log/agentix/server.log
+```
+
+### Environment Variables
+
+Common environment variables for local setup:
+
+```bash
+# Core settings
+AGENTIX_HOST=0.0.0.0
+AGENTIX_PORT=7880
+AGENTIX_LOG_LEVEL=info
+
+# Database
+AGENTIX_DB_TYPE=sqlite
+AGENTIX_DB_PATH=/data/agentix.db
+
+# Security (generate secure values for production)
+AGENTIX_API_KEY=your_api_key_here
+AGENTIX_JWT_SECRET=your_jwt_secret_here
+
+# External access
+AGENTIX_EXTERNAL_URL=http://your-ip-or-domain:7880
+```
+
+## Docker Compose Setup
+
+Complete Docker Compose configuration for local development:
+
+<CodeGroup>
+```yaml docker-compose.yml
+version: '3.8'
+
+services:
+  agentix:
+    image: agentixhub/agentix:latest
+    container_name: agentix-server
+    restart: unless-stopped
+    ports:
+      - "7880:7880"      # API & Web UI
+      - "7881:7881"      # RTC TCP
+      - "50000-60000:50000-60000/udp"  # RTC UDP
+    environment:
+      - AGENTIX_CONFIG_PATH=/etc/agentix/config.yaml
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-agentix123}
+      - REDIS_PASSWORD=${REDIS_PASSWORD:-redis123}
+    volumes:
+      - ./config:/etc/agentix:ro
+      - agentix-data:/var/lib/agentix
+      - agentix-logs:/var/log/agentix
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+
+  postgres:
+    image: postgres:15-alpine
+    container_name: agentix-postgres
+    restart: unless-stopped
+    environment:
+      - POSTGRES_DB=agentix
+      - POSTGRES_USER=agentix
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-agentix123}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U agentix -d agentix"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: agentix-redis
+    restart: unless-stopped
+    command: redis-server --requirepass ${REDIS_PASSWORD:-redis123}
+    volumes:
+      - redis-data:/data
+    ports:
+      - "6379:6379"
+
+volumes:
+  agentix-data:
+  agentix-logs:
+  postgres-data:
+  redis-data:
+```
+
+```bash .env
+# Environment variables for Docker Compose
+POSTGRES_PASSWORD=secure_postgres_password
+REDIS_PASSWORD=secure_redis_password
+AGENTIX_EXTERNAL_URL=http://localhost:7880
+```
+</CodeGroup>
+
+## Network Access
+
+### Local Network Access
+
+To access Agentix from other devices on your network:
+
+<CodeGroup>
+```bash Firewall (Ubuntu/Debian)
+# Allow Agentix ports through firewall
+sudo ufw allow 7880/tcp comment "Agentix API"
+sudo ufw allow 7881/tcp comment "Agentix RTC TCP" 
+sudo ufw allow 50000:60000/udp comment "Agentix RTC UDP"
+
+# Check firewall status
+sudo ufw status
+```
+
+```bash Firewall (CentOS/RHEL)
+# Open ports in firewalld
+sudo firewall-cmd --permanent --add-port=7880/tcp
+sudo firewall-cmd --permanent --add-port=7881/tcp
+sudo firewall-cmd --permanent --add-port=50000-60000/udp
+sudo firewall-cmd --reload
+
+# Check open ports
+sudo firewall-cmd --list-ports
+```
+
+```bash Find Your IP Address
+# Get your local IP address
+ip addr show | grep "inet " | grep -v 127.0.0.1
+
+# Or use hostname command
+hostname -I
+```
+</CodeGroup>
+
+Then access Agentix at: `http://YOUR_LOCAL_IP:7880`
+
+### Port Forwarding (Router Setup)
+
+For external internet access, configure your router:
+
+| Service | Internal Port | External Port | Protocol | Description |
+|---------|---------------|---------------|----------|-------------|
+| Web/API | 7880 | 7880 | TCP | Main interface |
+| RTC TCP | 7881 | 7881 | TCP | Fallback for RTC |
+| RTC UDP | 50000-60000 | 50000-60000 | UDP | Media streams |
+
+## System Requirements
+
+### Minimum Requirements
+- **CPU**: 2 cores (2.0GHz+)
+- **RAM**: 4GB
+- **Storage**: 20GB available space
+- **OS**: Ubuntu 20.04+, CentOS 7+, or Docker
+
+### Recommended for Local Testing
+- **CPU**: 4 cores (3.0GHz+) 
+- **RAM**: 8GB
+- **Storage**: 50GB SSD
+- **Network**: 100Mbps connection
+
+## Troubleshooting
+
+### Common Issues
+
+<AccordionGroup>
+<Accordion title="Port Already in Use">
+**Error**: `bind: address already in use`
+
+**Solution**:
+```bash
+# Check what's using the port
+sudo lsof -i :7880
+
+# Kill the process if safe to do so
+sudo kill -9 <PID>
+
+# Or change the port in config
+sed -i 's/7880/7881/g' config.yaml
+```
+</Accordion>
+
+<Accordion title="Can't Access from Other Devices">
+**Issue**: Agentix works on localhost but not from other devices
+
+**Solutions**:
+1. Check firewall settings (see Network Access section)
+2. Ensure Agentix binds to `0.0.0.0` not `127.0.0.1`
+3. Verify your local IP address
+4. Test connectivity: `telnet YOUR_IP 7880`
+</Accordion>
+
+<Accordion title="RTC/Audio Issues">
+**Issue**: Audio calls don't work or poor quality
+
+**Solutions**:
+1. Check UDP port range is open: `50000-60000`
+2. Verify external IP detection:
+   ```bash
+   curl ifconfig.me  # Check your external IP
+   ```
+3. Update RTC configuration with correct external IP
+4. Test with STUN server connectivity
+</Accordion>
+</AccordionGroup>
+
+### Logs and Debugging
+
+<CodeGroup>
+```bash Docker Logs
+# View Agentix logs
+docker logs agentix-server -f
+
+# View all service logs
+docker-compose logs -f
+
+# Check specific service
+docker-compose logs postgres
+```
+
+```bash System Logs
+# View system logs (if running as service)
+sudo journalctl -u agentix -f
+
+# Check log files
+tail -f /var/log/agentix/server.log
+tail -f /var/log/agentix/rtc.log
+```
+
+```bash Debug Mode
+# Run in debug mode for detailed logs
+docker run -e AGENTIX_LOG_LEVEL=debug agentixhub/agentix:latest
+
+# Or edit config file
+logging:
+  level: debug
+  console: true
+```
+</CodeGroup>
+
+## Next Steps
+
+Once you have Agentix running locally, explore these production deployment options:
+
+<CardGroup cols={2}>
+<Card title="Production Deployment" icon="rocket" href="/developer-guide/self-hosting/deployment">
+  Learn how to configure Agentix for production environments with SSL, load balancing, and security
+</Card>
+
+<Card title="Virtual Machine Setup" icon="server" href="/developer-guide/self-hosting/vm">
+  Deploy Agentix on dedicated virtual machines with full production configuration
+</Card>
+</CardGroup>
+
+<CardGroup cols={2}>
+<Card title="Kubernetes Deployment" icon="dharmachakra" href="/developer-guide/self-hosting/kubernetes">
+  Scale Agentix with container orchestration and auto-scaling capabilities
+</Card>
+
+<Card title="Network Configuration" icon="shield" href="/developer-guide/self-hosting/network-firewall">
+  Configure firewalls, security, and network requirements for different environments
+</Card>
+</CardGroup>
+
+## Architecture Options
+
+Agentix offers flexible deployment architectures to match your needs:
+
+<CardGroup cols={2}>
+<Card title="All-in-One" icon="server" href="#all-in-one-deployment">
+  Single server running both Agentix Core and RTC components
+  - **Best for**: Small to medium deployments
+  - **Easier management**: One server to maintain
+  - **Resource sharing**: Shared CPU and memory
+</Card>
+
+<Card title="Separate Servers" icon="network-wired" href="#separate-server-deployment">
+  Dedicated servers for Core API and RTC processing
+  - **Best for**: High-traffic production deployments
+  - **Better scaling**: Independent resource allocation
+  - **Fault isolation**: RTC issues don't affect API
+</Card>
+</CardGroup>
+
+
+
+## Next Steps
+
+Now that you understand the basics, choose your deployment path:
+
+<CardGroup cols={2}>
+<Card title="Production Deployment" icon="rocket" href="/developer-guide/self-hosting/deployment">
+  Configure Agentix for production with SSL, load balancing, and security
+</Card>
+
+<Card title="Network & Firewall" icon="shield" href="/developer-guide/self-hosting/network-firewall">
+  Set up ports, firewall rules, and security configurations
+</Card>
+</CardGroup>
+
+<Card title="Architecture Planning" icon="sitemap" href="/developer-guide/self-hosting/vm">
+  Choose between Docker, VM, or Kubernetes deployments
+</Card>

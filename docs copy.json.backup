@@ -89,6 +89,18 @@
 				],
 				"openapi": "openapi.json"
 			}
+			//,
+			// {
+			// 	"tab": "Self-Hosting",
+			// 	"pages": [
+			// 		"developer-guide/self-hosting/overview",
+			// 		"developer-guide/self-hosting/deployment",
+			// 		"developer-guide/self-hosting/vm",
+			// 		"developer-guide/self-hosting/kubernetes",
+			// 		"developer-guide/self-hosting/network-firewall",
+			// 		"developer-guide/self-hosting/benchmarks"
+			// 	]
+			// }
 		]
 	},
 	"logo": {
@@ -107,5 +119,12 @@
 			"label": "cPanel",
 			"href": "https://launch.agentixhub.ai/cpanel"
 		}
-	}
+	},
+	// "footer": {
+	// 	"socials": {
+	// 		"x": "https://example.com/x",
+	// 		"github": "https://example.com/github",
+	// 		"linkedin": "https://example.com/linkedin"
+	// 	}
+	// }
 }

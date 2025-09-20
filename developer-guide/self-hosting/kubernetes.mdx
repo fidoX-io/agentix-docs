@@ -1,0 +1,1529 @@
+---
+title: 'Kubernetes Deployment'
+description: 'Deploy Agentix on Kubernetes with auto-scaling, high availability, and enterprise orchestration'
+icon: 'dharmachakra'
+---
+
+# Kubernetes Deployment
+
+Deploy Agentix on Kubernetes for cloud-native scalability, auto-healing, and enterprise-grade orchestration capabilities.
+
+## Kubernetes Architecture
+
+### Cluster Requirements
+
+<Tabs>
+<Tab title="Small Cluster (Up to 1,000 users)">
+**Cluster Configuration:**
+- **Nodes**: 3 worker nodes
+- **Node Size**: 4 vCPU, 16GB RAM each
+- **Storage**: 200GB SSD per node
+- **Kubernetes**: v1.28+ 
+
+**Resource Allocation:**
+- **Agentix Pods**: 2 replicas
+- **Database**: PostgreSQL with persistent storage
+- **Cache**: Redis cluster (3 nodes)
+- **Load Balancer**: Nginx ingress controller
+</Tab>
+
+<Tab title="Medium Cluster (Up to 5,000 users)">
+**Cluster Configuration:**
+- **Nodes**: 6 worker nodes
+- **Node Size**: 8 vCPU, 32GB RAM each
+- **Storage**: 500GB SSD per node
+- **Kubernetes**: v1.28+
+
+**Resource Allocation:**
+- **Agentix Pods**: 4-8 replicas (auto-scaling)
+- **Database**: PostgreSQL primary + 2 replicas
+- **Cache**: Redis cluster (6 nodes)
+- **Load Balancer**: Cloud ALB/NLB
+</Tab>
+
+<Tab title="Large Cluster (Up to 20,000+ users)">
+**Cluster Configuration:**
+- **Nodes**: 12+ worker nodes
+- **Node Size**: 16 vCPU, 64GB RAM each
+- **Storage**: 1TB SSD per node
+- **Kubernetes**: v1.28+
+
+**Resource Allocation:**
+- **Agentix Pods**: 8-20 replicas (HPA/VPA)
+- **Database**: PostgreSQL cluster with read replicas
+- **Cache**: Redis cluster (12+ nodes)
+- **Load Balancer**: Multi-region distribution
+</Tab>
+</Tabs>
+
+### Component Architecture
+
+```yaml
+┌─────────────────────────────────────────────┐
+│               Load Balancer                 │
+│        (Ingress Controller)                 │
+│    • SSL Termination                        │
+│    • Traffic Routing                        │
+│    • Rate Limiting                          │
+└─────────────┬───────────────────────────────┘
+              │
+    ┌─────────▼─────────┐
+    │   Agentix Pods    │
+    │ (Auto-scaling)    │
+    │ ┌─────┐ ┌─────┐   │
+    │ │Pod 1│ │Pod 2│   │
+    │ └─────┘ └─────┘   │
+    │ ┌─────┐ ┌─────┐   │
+    │ │Pod 3│ │Pod n│   │
+    │ └─────┘ └─────┘   │
+    └─────────┬─────────┘
+              │
+    ┌─────────▼─────────┐
+    │  Database Layer   │
+    │ ┌───────────────┐ │
+    │ │ PostgreSQL    │ │
+    │ │ StatefulSet   │ │
+    │ └───────────────┘ │
+    │ ┌───────────────┐ │
+    │ │ Redis Cluster │ │
+    │ │ StatefulSet   │ │
+    │ └───────────────┘ │
+    └───────────────────┘
+```
+
+## Kubernetes Manifests
+
+### Namespace and Configuration
+
+<CodeGroup>
+```yaml namespace.yaml
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: agentix-production
+  labels:
+    name: agentix-production
+    tier: production
+
+---
+# Resource Quota
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: agentix-quota
+  namespace: agentix-production
+spec:
+  hard:
+    requests.cpu: "50"
+    requests.memory: 100Gi
+    limits.cpu: "100"
+    limits.memory: 200Gi
+    persistentvolumeclaims: "10"
+    services.loadbalancers: "2"
+
+---
+# Network Policy
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: agentix-network-policy
+  namespace: agentix-production
+spec:
+  podSelector:
+    matchLabels:
+      app: agentix
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: ingress-nginx
+    - podSelector:
+        matchLabels:
+          app: agentix
+    ports:
+    - protocol: TCP
+      port: 7880
+    - protocol: TCP
+      port: 7881
+  egress:
+  - to:
+    - podSelector:
+        matchLabels:
+          app: postgres
+  - to:
+    - podSelector:
+        matchLabels:
+          app: redis
+  - to: []  # Allow external traffic for API calls
+    ports:
+    - protocol: TCP
+      port: 443
+    - protocol: TCP
+      port: 80
+```
+
+```yaml configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: agentix-config
+  namespace: agentix-production
+data:
+  AGENTIX_ENV: "production"
+  AGENTIX_LOG_LEVEL: "info"
+  POSTGRES_HOST: "postgres-service"
+  POSTGRES_DB: "agentix_production"
+  REDIS_HOST: "redis-service"
+  EXTERNAL_URL: "https://agentix.yourdomain.com"
+  WEBSOCKET_URL: "wss://agentix.yourdomain.com/ws"
+  # RTC Configuration
+  RTC_TCP_PORT: "7881"
+  RTC_UDP_PORT_RANGE_START: "50000"
+  RTC_UDP_PORT_RANGE_END: "60000"
+  # Performance tuning
+  MAX_CONCURRENT_CONNECTIONS: "10000"
+  WORKER_THREADS: "8"
+  DB_CONNECTION_POOL_SIZE: "20"
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: agentix-secrets
+  namespace: agentix-production
+type: Opaque
+stringData:
+  POSTGRES_USER: "agentix_prod"
+  POSTGRES_PASSWORD: "your_secure_postgres_password"
+  REDIS_PASSWORD: "your_secure_redis_password"
+  AGENTIX_API_KEY: "your_secure_api_key"
+  JWT_SECRET: "your_jwt_secret_key"
+  ENCRYPTION_KEY: "your_32_character_encryption_key"
+```
+</CodeGroup>
+
+### Agentix Application Deployment
+
+<CodeGroup>
+```yaml agentix-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: agentix-app
+  namespace: agentix-production
+  labels:
+    app: agentix
+    component: app
+spec:
+  replicas: 3  # Will be managed by HPA
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: agentix
+      component: app
+  template:
+    metadata:
+      labels:
+        app: agentix
+        component: app
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "9090"
+        prometheus.io/path: "/metrics"
+    spec:
+      # Security Context
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        fsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
+      
+      # Service Account
+      serviceAccountName: agentix-sa
+      
+      # Anti-affinity for HA
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - agentix
+              topologyKey: kubernetes.io/hostname
+      
+      # Init Container for DB Migration
+      initContainers:
+      - name: db-migration
+        image: agentixhub/agentix:latest
+        command: ['./scripts/migrate-db.sh']
+        envFrom:
+        - configMapRef:
+            name: agentix-config
+        - secretRef:
+            name: agentix-secrets
+        resources:
+          requests:
+            cpu: 100m
+            memory: 256Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
+      
+      containers:
+      - name: agentix
+        image: agentixhub/agentix:latest
+        imagePullPolicy: IfNotPresent
+        
+        # Ports
+        ports:
+        - name: http
+          containerPort: 7880
+          protocol: TCP
+        - name: rtc-tcp
+          containerPort: 7881
+          protocol: TCP
+        - name: metrics
+          containerPort: 9090
+          protocol: TCP
+        
+        # Environment
+        envFrom:
+        - configMapRef:
+            name: agentix-config
+        - secretRef:
+            name: agentix-secrets
+        
+        # Resource Requirements
+        resources:
+          requests:
+            cpu: "1"
+            memory: "2Gi"
+          limits:
+            cpu: "4"
+            memory: "8Gi"
+        
+        # Volume Mounts
+        volumeMounts:
+        - name: config-volume
+          mountPath: /etc/agentix
+          readOnly: true
+        - name: data-volume
+          mountPath: /var/lib/agentix
+        - name: tmp-volume
+          mountPath: /tmp
+        
+        # Health Probes
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 60
+          timeoutSeconds: 10
+          periodSeconds: 30
+          failureThreshold: 3
+          successThreshold: 1
+        
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 30
+          timeoutSeconds: 5
+          periodSeconds: 10
+          failureThreshold: 3
+          successThreshold: 1
+        
+        # Startup Probe (for slow starting containers)
+        startupProbe:
+          httpGet:
+            path: /health
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 10
+          timeoutSeconds: 10
+          periodSeconds: 10
+          failureThreshold: 30
+          successThreshold: 1
+        
+        # Security Context
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+          runAsUser: 1000
+          capabilities:
+            drop:
+            - ALL
+      
+      # Volumes
+      volumes:
+      - name: config-volume
+        configMap:
+          name: agentix-config-files
+      - name: data-volume
+        persistentVolumeClaim:
+          claimName: agentix-data-pvc
+      - name: tmp-volume
+        emptyDir: {}
+      
+      # Termination Grace Period
+      terminationGracePeriodSeconds: 60
+
+---
+# Service Account
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: agentix-sa
+  namespace: agentix-production
+  annotations:
+    eks.amazonaws.com/role-arn: arn:aws:iam::ACCOUNT:role/agentix-pod-role
+
+---
+# Role for pod access
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: agentix-role
+  namespace: agentix-production
+rules:
+- apiGroups: [""]
+  resources: ["pods", "services", "endpoints"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: ["apps"]
+  resources: ["deployments", "replicasets"]
+  verbs: ["get", "list", "watch"]
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: agentix-rolebinding
+  namespace: agentix-production
+subjects:
+- kind: ServiceAccount
+  name: agentix-sa
+  namespace: agentix-production
+roleRef:
+  kind: Role
+  name: agentix-role
+  apiGroup: rbac.authorization.k8s.io
+```
+
+```yaml agentix-service.yaml
+# Main Application Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: agentix-service
+  namespace: agentix-production
+  labels:
+    app: agentix
+    component: app
+  annotations:
+    service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
+    service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: "true"
+spec:
+  type: LoadBalancer
+  externalTrafficPolicy: Local  # Preserve client IP
+  ports:
+  - name: http
+    port: 80
+    targetPort: http
+    protocol: TCP
+  - name: https
+    port: 443
+    targetPort: http
+    protocol: TCP
+  - name: rtc-tcp
+    port: 7881
+    targetPort: rtc-tcp
+    protocol: TCP
+  selector:
+    app: agentix
+    component: app
+
+---
+# Internal Service for Pod-to-Pod Communication
+apiVersion: v1
+kind: Service
+metadata:
+  name: agentix-internal
+  namespace: agentix-production
+  labels:
+    app: agentix
+    component: internal
+spec:
+  type: ClusterIP
+  ports:
+  - name: http
+    port: 7880
+    targetPort: http
+    protocol: TCP
+  - name: rtc-tcp
+    port: 7881
+    targetPort: rtc-tcp
+    protocol: TCP
+  selector:
+    app: agentix
+    component: app
+
+---
+# Headless Service for StatefulSet Discovery
+apiVersion: v1
+kind: Service
+metadata:
+  name: agentix-headless
+  namespace: agentix-production
+  labels:
+    app: agentix
+    component: headless
+spec:
+  type: ClusterIP
+  clusterIP: None
+  ports:
+  - name: http
+    port: 7880
+    targetPort: http
+    protocol: TCP
+  selector:
+    app: agentix
+    component: app
+```
+</CodeGroup>
+
+### Auto-Scaling Configuration
+
+<CodeGroup>
+```yaml hpa.yaml
+# Horizontal Pod Autoscaler
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: agentix-hpa
+  namespace: agentix-production
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: agentix-app
+  minReplicas: 3
+  maxReplicas: 20
+  metrics:
+  # CPU-based scaling
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+  # Memory-based scaling  
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 80
+  # Custom metrics (if available)
+  - type: Pods
+    pods:
+      metric:
+        name: agentix_active_connections
+      target:
+        type: AverageValue
+        averageValue: "1000"
+  
+  # Scaling behavior
+  behavior:
+    scaleUp:
+      stabilizationWindowSeconds: 300
+      policies:
+      - type: Percent
+        value: 100
+        periodSeconds: 15
+      - type: Pods
+        value: 2
+        periodSeconds: 60
+      selectPolicy: Max
+    scaleDown:
+      stabilizationWindowSeconds: 600
+      policies:
+      - type: Percent
+        value: 10
+        periodSeconds: 60
+      - type: Pods
+        value: 1
+        periodSeconds: 60
+      selectPolicy: Min
+
+---
+# Vertical Pod Autoscaler (Optional)
+apiVersion: autoscaling.k8s.io/v1
+kind: VerticalPodAutoscaler
+metadata:
+  name: agentix-vpa
+  namespace: agentix-production
+spec:
+  targetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: agentix-app
+  updatePolicy:
+    updateMode: "Auto"  # or "Off" for recommendations only
+  resourcePolicy:
+    containerPolicies:
+    - containerName: agentix
+      maxAllowed:
+        cpu: "8"
+        memory: "16Gi"
+      minAllowed:
+        cpu: "100m"
+        memory: "256Mi"
+      controlledResources: ["cpu", "memory"]
+```
+
+```yaml pod-disruption-budget.yaml
+# Pod Disruption Budget
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: agentix-pdb
+  namespace: agentix-production
+spec:
+  minAvailable: 2  # Always keep at least 2 pods running
+  selector:
+    matchLabels:
+      app: agentix
+      component: app
+```
+</CodeGroup>
+
+### Persistent Storage
+
+<CodeGroup>
+```yaml storage.yaml
+# Storage Class for High Performance
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: agentix-fast-ssd
+provisioner: kubernetes.io/aws-ebs  # Adjust for your cloud provider
+parameters:
+  type: gp3
+  iops: "3000"
+  throughput: "125"
+  encrypted: "true"
+volumeBindingMode: WaitForFirstConsumer
+allowVolumeExpansion: true
+reclaimPolicy: Retain
+
+---
+# PVC for Agentix Data
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: agentix-data-pvc
+  namespace: agentix-production
+  labels:
+    app: agentix
+    component: storage
+spec:
+  accessModes:
+  - ReadWriteOnce
+  storageClassName: agentix-fast-ssd
+  resources:
+    requests:
+      storage: 100Gi  # Adjust based on needs
+  volumeMode: Filesystem
+
+---
+# PVC for Database
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgres-data-pvc
+  namespace: agentix-production
+  labels:
+    app: postgres
+    component: storage
+spec:
+  accessModes:
+  - ReadWriteOnce
+  storageClassName: agentix-fast-ssd
+  resources:
+    requests:
+      storage: 500Gi  # Adjust based on data needs
+  volumeMode: Filesystem
+```
+</CodeGroup>
+
+### Database Configuration
+
+<CodeGroup>
+```yaml postgres.yaml
+# PostgreSQL StatefulSet
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: postgres
+  namespace: agentix-production
+spec:
+  serviceName: postgres-headless
+  replicas: 1  # Primary only, add replicas for HA
+  selector:
+    matchLabels:
+      app: postgres
+      role: primary
+  template:
+    metadata:
+      labels:
+        app: postgres
+        role: primary
+    spec:
+      securityContext:
+        runAsUser: 999
+        runAsGroup: 999
+        fsGroup: 999
+      
+      containers:
+      - name: postgres
+        image: postgres:15-alpine
+        imagePullPolicy: IfNotPresent
+        
+        # Environment
+        env:
+        - name: POSTGRES_DB
+          valueFrom:
+            configMapKeyRef:
+              name: agentix-config
+              key: POSTGRES_DB
+        - name: POSTGRES_USER
+          valueFrom:
+            secretKeyRef:
+              name: agentix-secrets
+              key: POSTGRES_USER
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: agentix-secrets
+              key: POSTGRES_PASSWORD
+        - name: PGDATA
+          value: /var/lib/postgresql/data/pgdata
+        
+        # Ports
+        ports:
+        - name: postgres
+          containerPort: 5432
+          protocol: TCP
+        
+        # Resources
+        resources:
+          requests:
+            cpu: "1"
+            memory: "4Gi"
+          limits:
+            cpu: "4"
+            memory: "8Gi"
+        
+        # Volume Mounts
+        volumeMounts:
+        - name: postgres-data
+          mountPath: /var/lib/postgresql/data
+        - name: postgres-config
+          mountPath: /etc/postgresql/postgresql.conf
+          subPath: postgresql.conf
+        
+        # Health Checks
+        livenessProbe:
+          exec:
+            command:
+            - /bin/bash
+            - -c
+            - pg_isready -U $POSTGRES_USER -d $POSTGRES_DB
+          initialDelaySeconds: 30
+          timeoutSeconds: 5
+          periodSeconds: 30
+          failureThreshold: 3
+        
+        readinessProbe:
+          exec:
+            command:
+            - /bin/bash
+            - -c
+            - pg_isready -U $POSTGRES_USER -d $POSTGRES_DB
+          initialDelaySeconds: 10
+          timeoutSeconds: 5
+          periodSeconds: 10
+          failureThreshold: 3
+        
+        # Security Context
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: false  # PostgreSQL needs write access
+          runAsNonRoot: true
+          runAsUser: 999
+      
+      volumes:
+      - name: postgres-config
+        configMap:
+          name: postgres-config
+  
+  volumeClaimTemplates:
+  - metadata:
+      name: postgres-data
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      storageClassName: agentix-fast-ssd
+      resources:
+        requests:
+          storage: 500Gi
+
+---
+# PostgreSQL Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-service
+  namespace: agentix-production
+spec:
+  type: ClusterIP
+  ports:
+  - name: postgres
+    port: 5432
+    targetPort: postgres
+    protocol: TCP
+  selector:
+    app: postgres
+    role: primary
+
+---
+# PostgreSQL Headless Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-headless
+  namespace: agentix-production
+spec:
+  type: ClusterIP
+  clusterIP: None
+  ports:
+  - name: postgres
+    port: 5432
+    targetPort: postgres
+    protocol: TCP
+  selector:
+    app: postgres
+
+---
+# PostgreSQL Configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-config
+  namespace: agentix-production
+data:
+  postgresql.conf: |
+    # Production PostgreSQL Configuration
+    
+    # Connection Settings
+    max_connections = 200
+    superuser_reserved_connections = 3
+    
+    # Memory Settings
+    shared_buffers = 2GB                    # 25% of total RAM
+    effective_cache_size = 6GB              # 75% of total RAM
+    work_mem = 16MB                         # For sorting and hash operations
+    maintenance_work_mem = 512MB            # For VACUUM, CREATE INDEX
+    
+    # WAL Settings
+    wal_buffers = 16MB
+    wal_level = replica
+    max_wal_size = 4GB
+    min_wal_size = 1GB
+    checkpoint_completion_target = 0.9
+    
+    # Query Planner
+    random_page_cost = 1.1                  # SSD storage
+    effective_io_concurrency = 200          # SSD concurrent I/O
+    
+    # Logging
+    log_destination = 'stderr'
+    logging_collector = on
+    log_min_duration_statement = 1000       # Log slow queries (1 sec)
+    log_checkpoints = on
+    log_connections = on
+    log_disconnections = on
+    log_lock_waits = on
+    
+    # Extensions
+    shared_preload_libraries = 'pg_stat_statements'
+    
+    # Performance
+    default_statistics_target = 100
+    max_worker_processes = 8
+    max_parallel_workers_per_gather = 4
+    max_parallel_workers = 8
+    max_parallel_maintenance_workers = 4
+```
+</CodeGroup>
+
+### Redis Configuration
+
+<CodeGroup>
+```yaml redis.yaml
+# Redis StatefulSet
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: redis
+  namespace: agentix-production
+spec:
+  serviceName: redis-headless
+  replicas: 3  # Redis cluster with 3 masters
+  selector:
+    matchLabels:
+      app: redis
+  template:
+    metadata:
+      labels:
+        app: redis
+    spec:
+      securityContext:
+        runAsUser: 999
+        runAsGroup: 999
+        fsGroup: 999
+      
+      containers:
+      - name: redis
+        image: redis:7-alpine
+        imagePullPolicy: IfNotPresent
+        
+        # Command
+        command:
+        - redis-server
+        - /etc/redis/redis.conf
+        
+        # Ports
+        ports:
+        - name: redis
+          containerPort: 6379
+          protocol: TCP
+        - name: cluster
+          containerPort: 16379
+          protocol: TCP
+        
+        # Environment
+        env:
+        - name: REDIS_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: agentix-secrets
+              key: REDIS_PASSWORD
+        
+        # Resources
+        resources:
+          requests:
+            cpu: 500m
+            memory: "2Gi"
+          limits:
+            cpu: "2"
+            memory: "4Gi"
+        
+        # Volume Mounts
+        volumeMounts:
+        - name: redis-data
+          mountPath: /data
+        - name: redis-config
+          mountPath: /etc/redis/redis.conf
+          subPath: redis.conf
+        
+        # Health Checks
+        livenessProbe:
+          exec:
+            command:
+            - redis-cli
+            - --no-auth-warning
+            - -a
+            - $(REDIS_PASSWORD)
+            - ping
+          initialDelaySeconds: 30
+          timeoutSeconds: 5
+          periodSeconds: 30
+          failureThreshold: 3
+        
+        readinessProbe:
+          exec:
+            command:
+            - redis-cli
+            - --no-auth-warning
+            - -a
+            - $(REDIS_PASSWORD)
+            - ping
+          initialDelaySeconds: 10
+          timeoutSeconds: 5
+          periodSeconds: 10
+          failureThreshold: 3
+        
+        # Security Context
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: false
+          runAsNonRoot: true
+          runAsUser: 999
+      
+      volumes:
+      - name: redis-config
+        configMap:
+          name: redis-config
+  
+  volumeClaimTemplates:
+  - metadata:
+      name: redis-data
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      storageClassName: agentix-fast-ssd
+      resources:
+        requests:
+          storage: 100Gi
+
+---
+# Redis Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-service
+  namespace: agentix-production
+spec:
+  type: ClusterIP
+  ports:
+  - name: redis
+    port: 6379
+    targetPort: redis
+    protocol: TCP
+  selector:
+    app: redis
+
+---
+# Redis Headless Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-headless
+  namespace: agentix-production
+spec:
+  type: ClusterIP
+  clusterIP: None
+  ports:
+  - name: redis
+    port: 6379
+    targetPort: redis
+    protocol: TCP
+  - name: cluster
+    port: 16379
+    targetPort: cluster
+    protocol: TCP
+  selector:
+    app: redis
+
+---
+# Redis Configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: redis-config
+  namespace: agentix-production
+data:
+  redis.conf: |
+    # Production Redis Configuration
+    
+    # Basic Settings
+    port 6379
+    bind 0.0.0.0
+    protected-mode yes
+    timeout 0
+    
+    # Authentication
+    requirepass ${REDIS_PASSWORD}
+    
+    # Memory Management
+    maxmemory 3gb
+    maxmemory-policy allkeys-lru
+    
+    # Persistence
+    save 900 1
+    save 300 10
+    save 60 10000
+    
+    # AOF Configuration
+    appendonly yes
+    appendfsync everysec
+    auto-aof-rewrite-percentage 100
+    auto-aof-rewrite-min-size 64mb
+    
+    # Networking
+    tcp-keepalive 300
+    tcp-backlog 511
+    
+    # Logging
+    loglevel notice
+    
+    # Performance
+    hash-max-ziplist-entries 512
+    hash-max-ziplist-value 64
+    list-max-ziplist-size -2
+    set-max-intset-entries 512
+    zset-max-ziplist-entries 128
+    zset-max-ziplist-value 64
+    
+    # Security
+    rename-command FLUSHDB ""
+    rename-command FLUSHALL ""
+    rename-command DEBUG ""
+```
+</CodeGroup>
+
+### Ingress and SSL Configuration
+
+<CodeGroup>
+```yaml ingress.yaml
+# Ingress Controller (if not using cloud load balancer)
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: agentix-ingress
+  namespace: agentix-production
+  annotations:
+    # Nginx Ingress Controller
+    kubernetes.io/ingress.class: "nginx"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    
+    # SSL Configuration
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    nginx.ingress.kubernetes.io/ssl-protocols: "TLSv1.2 TLSv1.3"
+    nginx.ingress.kubernetes.io/ssl-ciphers: "ECDHE-ECDSA-AES128-GCM-SHA256,ECDHE-RSA-AES128-GCM-SHA256"
+    
+    # Rate Limiting
+    nginx.ingress.kubernetes.io/rate-limit: "1000"
+    nginx.ingress.kubernetes.io/rate-limit-window: "1m"
+    
+    # WebSocket Support
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+    nginx.ingress.kubernetes.io/websocket-services: "agentix-service"
+    
+    # Large Body Support (for file uploads)
+    nginx.ingress.kubernetes.io/proxy-body-size: "100m"
+    
+    # CORS (if needed)
+    nginx.ingress.kubernetes.io/enable-cors: "true"
+    nginx.ingress.kubernetes.io/cors-allow-methods: "GET, POST, PUT, DELETE, OPTIONS"
+    nginx.ingress.kubernetes.io/cors-allow-headers: "DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Authorization"
+
+spec:
+  tls:
+  - hosts:
+    - agentix.yourdomain.com
+    secretName: agentix-tls-secret
+  
+  rules:
+  - host: agentix.yourdomain.com
+    http:
+      paths:
+      # Main API and Web Interface
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: agentix-service
+            port:
+              number: 80
+      # WebSocket endpoint
+      - path: /ws
+        pathType: Prefix
+        backend:
+          service:
+            name: agentix-service
+            port:
+              number: 80
+      # API endpoints
+      - path: /api
+        pathType: Prefix
+        backend:
+          service:
+            name: agentix-service
+            port:
+              number: 80
+
+---
+# SSL Certificate (using cert-manager)
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: agentix-tls-cert
+  namespace: agentix-production
+spec:
+  secretName: agentix-tls-secret
+  issuerRef:
+    name: letsencrypt-prod
+    kind: ClusterIssuer
+  dnsNames:
+  - agentix.yourdomain.com
+  - www.agentix.yourdomain.com
+
+---
+# ClusterIssuer for Let's Encrypt (requires cert-manager)
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-prod
+spec:
+  acme:
+    server: https://acme-v02.api.letsencrypt.org/directory
+    email: admin@yourdomain.com
+    privateKeySecretRef:
+      name: letsencrypt-prod
+    solvers:
+    - http01:
+        ingress:
+          class: nginx
+```
+</CodeGroup>
+
+## Monitoring and Observability
+
+### Prometheus and Grafana Setup
+
+<CodeGroup>
+```yaml monitoring.yaml
+# ServiceMonitor for Prometheus
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: agentix-metrics
+  namespace: agentix-production
+  labels:
+    app: agentix
+    release: prometheus
+spec:
+  selector:
+    matchLabels:
+      app: agentix
+      component: app
+  endpoints:
+  - port: metrics
+    path: /metrics
+    interval: 30s
+    scrapeTimeout: 10s
+
+---
+# PrometheusRule for Alerting
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: agentix-alerts
+  namespace: agentix-production
+  labels:
+    app: agentix
+    release: prometheus
+spec:
+  groups:
+  - name: agentix
+    rules:
+    # High CPU Usage
+    - alert: AgentixHighCPU
+      expr: rate(container_cpu_usage_seconds_total{pod=~"agentix-app-.*"}[5m]) > 0.8
+      for: 5m
+      labels:
+        severity: warning
+        service: agentix
+      annotations:
+        summary: "Agentix pod {{ $labels.pod }} high CPU usage"
+        description: "CPU usage is above 80% for more than 5 minutes"
+    
+    # High Memory Usage
+    - alert: AgentixHighMemory
+      expr: container_memory_usage_bytes{pod=~"agentix-app-.*"} / container_spec_memory_limit_bytes > 0.9
+      for: 5m
+      labels:
+        severity: warning
+        service: agentix
+      annotations:
+        summary: "Agentix pod {{ $labels.pod }} high memory usage"
+        description: "Memory usage is above 90% for more than 5 minutes"
+    
+    # Pod Restart
+    - alert: AgentixPodRestart
+      expr: rate(kube_pod_container_status_restarts_total{pod=~"agentix-app-.*"}[15m]) > 0
+      for: 0m
+      labels:
+        severity: warning
+        service: agentix
+      annotations:
+        summary: "Agentix pod {{ $labels.pod }} restarted"
+        description: "Pod has restarted {{ $value }} times in the last 15 minutes"
+    
+    # Service Down
+    - alert: AgentixServiceDown
+      expr: up{job="agentix-app"} == 0
+      for: 1m
+      labels:
+        severity: critical
+        service: agentix
+      annotations:
+        summary: "Agentix service is down"
+        description: "Agentix service has been down for more than 1 minute"
+    
+    # Database Connection Issues
+    - alert: AgentixDatabaseConnections
+      expr: agentix_database_connections_active > 180
+      for: 5m
+      labels:
+        severity: warning
+        service: agentix
+      annotations:
+        summary: "High database connection count"
+        description: "Active database connections: {{ $value }}"
+```
+</CodeGroup>
+
+## Next Steps
+
+<CardGroup cols={2}>
+<Card title="Virtual Machine Architecture" icon="server" href="/developer-guide/self-hosting/vm">
+  Review VM specifications and multi-zone deployment patterns
+</Card>
+
+<Card title="Network Configuration" icon="shield" href="/developer-guide/self-hosting/network-firewall">
+  Configure firewall rules and network security policies
+</Card>
+</CardGroup>
+
+<CardGroup cols={2}>
+<Card title="Deployment Architecture" icon="rocket" href="/developer-guide/self-hosting/deployment">
+  Review production deployment patterns and SSL configuration  
+</Card>
+
+<Card title="Performance Benchmarks" icon="chart-line" href="/developer-guide/self-hosting/benchmarks">
+  Understand capacity planning and performance expectations
+</Card>
+</CardGroup>
+
+### Deployment Script
+
+<CodeGroup>
+```bash deploy.sh
+#!/bin/bash
+# Kubernetes deployment script for Agentix
+
+set -e
+
+NAMESPACE="agentix-production"
+CHART_VERSION="latest"
+
+echo "🚀 Deploying Agentix to Kubernetes..."
+
+# Create namespace if it doesn't exist
+kubectl create namespace $NAMESPACE --dry-run=client -o yaml | kubectl apply -f -
+
+# Apply configurations
+echo "📋 Applying configurations..."
+kubectl apply -f namespace.yaml
+kubectl apply -f configmap.yaml
+
+# Deploy database
+echo "🗄️  Deploying PostgreSQL..."
+kubectl apply -f postgres.yaml
+
+# Deploy Redis
+echo "🔴 Deploying Redis..."
+kubectl apply -f redis.yaml
+
+# Wait for database to be ready
+echo "⏳ Waiting for database to be ready..."
+kubectl wait --for=condition=Ready pod -l app=postgres -n $NAMESPACE --timeout=300s
+
+# Deploy Agentix application
+echo "🎯 Deploying Agentix application..."
+kubectl apply -f agentix-deployment.yaml
+kubectl apply -f agentix-service.yaml
+
+# Deploy auto-scaling
+echo "📈 Configuring auto-scaling..."
+kubectl apply -f hpa.yaml
+kubectl apply -f pod-disruption-budget.yaml
+
+# Deploy ingress
+echo "🌐 Configuring ingress..."
+kubectl apply -f ingress.yaml
+
+# Wait for deployment to be ready
+echo "⏳ Waiting for deployment to be ready..."
+kubectl wait --for=condition=Available deployment/agentix-app -n $NAMESPACE --timeout=600s
+
+# Check status
+echo "✅ Deployment Status:"
+kubectl get all -n $NAMESPACE
+
+echo "🎉 Agentix deployed successfully!"
+echo "📊 Monitor with: kubectl get pods -n $NAMESPACE -w"
+echo "📋 View logs with: kubectl logs -f deployment/agentix-app -n $NAMESPACE"
+```
+
+```bash rollback.sh
+#!/bin/bash
+# Rollback script for Agentix
+
+set -e
+
+NAMESPACE="agentix-production"
+
+echo "🔄 Rolling back Agentix deployment..."
+
+# Get current revision
+CURRENT_REVISION=$(kubectl rollout history deployment/agentix-app -n $NAMESPACE --revision=0 | tail -n 1 | awk '{print $1}')
+PREVIOUS_REVISION=$((CURRENT_REVISION - 1))
+
+echo "📋 Current revision: $CURRENT_REVISION"
+echo "📋 Rolling back to revision: $PREVIOUS_REVISION"
+
+# Rollback
+kubectl rollout undo deployment/agentix-app -n $NAMESPACE --to-revision=$PREVIOUS_REVISION
+
+# Wait for rollback to complete
+echo "⏳ Waiting for rollback to complete..."
+kubectl rollout status deployment/agentix-app -n $NAMESPACE
+
+# Check status
+echo "✅ Rollback Status:"
+kubectl get pods -n $NAMESPACE -l app=agentix
+
+echo "🎉 Rollback completed successfully!"
+```
+
+```bash scale.sh
+#!/bin/bash
+# Scaling script for Agentix
+
+set -e
+
+NAMESPACE="agentix-production"
+REPLICAS=${1:-5}
+
+echo "📈 Scaling Agentix to $REPLICAS replicas..."
+
+# Scale deployment
+kubectl scale deployment agentix-app --replicas=$REPLICAS -n $NAMESPACE
+
+# Wait for scaling to complete
+echo "⏳ Waiting for scaling to complete..."
+kubectl rollout status deployment/agentix-app -n $NAMESPACE
+
+# Check status
+echo "✅ Scaling Status:"
+kubectl get pods -n $NAMESPACE -l app=agentix
+
+echo "🎉 Scaling completed successfully!"
+echo "📊 Current replicas: $(kubectl get deployment agentix-app -n $NAMESPACE -o jsonpath='{.status.readyReplicas}')"
+```
+</CodeGroup>
+
+## Troubleshooting
+
+### Common Issues
+
+<AccordionGroup>
+<Accordion title="Pod Startup Issues">
+**Problem**: Pods failing to start or crashing
+
+**Diagnosis**:
+```bash
+# Check pod status
+kubectl get pods -n agentix-production
+
+# View pod events
+kubectl describe pod <pod-name> -n agentix-production
+
+# Check logs
+kubectl logs <pod-name> -n agentix-production --previous
+```
+
+**Solutions**:
+- Check resource limits and requests
+- Verify database connectivity
+- Review configuration and secrets
+- Check persistent volume availability
+</Accordion>
+
+<Accordion title="Database Connection Issues">
+**Problem**: Application cannot connect to database
+
+**Diagnosis**:
+```bash
+# Check database pod status
+kubectl get pods -l app=postgres -n agentix-production
+
+# Test database connectivity
+kubectl exec -it <agentix-pod> -n agentix-production -- nc -zv postgres-service 5432
+
+# Check database logs
+kubectl logs <postgres-pod> -n agentix-production
+```
+
+**Solutions**:
+- Verify database service is running
+- Check network policies
+- Validate credentials in secrets
+- Ensure database initialization completed
+</Accordion>
+
+<Accordion title="Auto-scaling Not Working">
+**Problem**: HPA not scaling pods
+
+**Diagnosis**:
+```bash
+# Check HPA status
+kubectl get hpa -n agentix-production
+
+# View HPA details
+kubectl describe hpa agentix-hpa -n agentix-production
+
+# Check metrics server
+kubectl top pods -n agentix-production
+```
+
+**Solutions**:
+- Ensure metrics-server is installed
+- Verify resource requests are set
+- Check HPA conditions and events
+- Review scaling policies and thresholds
+</Accordion>
+</AccordionGroup>
+
+## Next Steps
+
+<CardGroup cols={2}>
+<Card title="Performance Benchmarks" icon="chart-line" href="/developer-guide/self-hosting/benchmarks">
+  Learn about expected performance characteristics and capacity planning for Kubernetes deployments
+</Card>
+
+<Card title="Network Configuration" icon="shield" href="/developer-guide/self-hosting/network-firewall">
+  Configure advanced networking, security policies, and firewall rules for Kubernetes
+</Card>
+</CardGroup>

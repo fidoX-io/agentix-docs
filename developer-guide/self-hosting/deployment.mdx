@@ -1,0 +1,649 @@
+---
+title: 'Deployment Architecture'
+description: 'Production deployment patterns, SSL requirements, and load balancing strategies'
+icon: 'rocket'
+---
+
+# Deployment Architecture
+
+Essential deployment patterns, SSL configuration, and production architecture considerations for enterprise Agentix deployments.
+
+<Warning>
+All production deployments require SSL/TLS certificates, proper load balancing, and security hardening. Plan your architecture before deployment.
+</Warning>
+
+## Deployment Patterns
+
+### Single-Zone Production Architecture
+
+For production deployments within a single geographic region:
+
+```yaml
+┌─────────────────────────────────────────────────────────┐
+│                    Internet Gateway                     │
+│                 (Public IP, DDoS Protection)           │
+└─────────────────────┬───────────────────────────────────┘
+                      │
+┌─────────────────────▼───────────────────────────────────┐
+│                 Load Balancer Layer                     │
+│  ┌─────────────────┐       ┌─────────────────────────┐  │
+│  │   Primary LB    │◄─────►│    Secondary LB         │  │
+│  │ (Active)        │       │ (Standby/Health Check)  │  │
+│  └─────────────────┘       └─────────────────────────┘  │
+└─────────────────────┬───────────────────────────────────┘
+                      │
+        ┌─────────────┼─────────────┐
+        │             │             │
+┌───────▼───────┐ ┌───▼────────┐ ┌──▼─────────┐
+│ App Server 1  │ │ App Server │ │ RTC Server │
+│ (Primary)     │ │ (Secondary)│ │ (Dedicated)│
+└───────────────┘ └────────────┘ └────────────┘
+        │             │             │
+        └─────────────┼─────────────┘
+                      │
+    ┌─────────────────▼─────────────────┐
+    │        Database & Cache Layer     │
+    │  ┌─────────────┐ ┌─────────────┐  │
+    │  │ PostgreSQL  │ │ Redis       │  │
+    │  │ Primary     │ │ Cluster     │  │
+    │  └─────────────┘ └─────────────┘  │
+    └───────────────────────────────────┘
+```
+
+### Multi-Zone Enterprise Architecture
+
+For enterprise deployments requiring high availability and disaster recovery:
+
+```yaml
+┌─────────────────────────────────────────────────────────────────┐
+│                     Global Load Balancer                       │
+│           (GeoDNS, Traffic Management, DDoS Protection)        │
+└─────────────────────┬───────────────────────┬───────────────────┘
+                      │                       │
+          ┌───────────▼───────────┐   ┌───────▼───────────┐
+          │    Primary Zone A     │   │  Secondary Zone B │
+          │   (Active Traffic)    │   │ (Failover/DR)     │
+          └───────────┬───────────┘   └───────┬───────────┘
+                      │                       │
+      ┌───────────────▼───────────────┐   ┌───▼───────────────┐
+      │     Regional LB Cluster       │   │  Regional LB      │
+      │  (Active-Active, Auto-fail)   │   │ (Standby Mode)    │
+      └───────────────┬───────────────┘   └───┬───────────────┘
+                      │                       │
+    ┌─────────────────┼─────────────────┐     │
+    │                 │                 │     │
+┌───▼───────┐ ┌───────▼──┐ ┌────────────▼─┐   │
+│App Cluster│ │RTC Cluster│ │Edge Services │   │
+│(3+ nodes) │ │(2+ nodes) │ │(Monitoring)  │   │
+└───────────┘ └──────────┘ └──────────────┘   │
+    │                 │                       │
+    └─────────────────┼───────────────────────┘
+                      │
+    ┌─────────────────▼─────────────────┐
+    │       Data Layer (Replicated)     │
+    │ ┌─────────────┐ ┌─────────────────┐│
+    │ │ Primary DB  │ │ Redis Cluster   ││
+    │ │ + Replicas  │ │ (Cross-Zone)    ││
+    │ └─────────────┘ └─────────────────┘│
+    └───────────────────────────────────┘
+```
+
+## SSL/TLS Configuration
+
+### Certificate Requirements
+
+<CardGroup cols={2}>
+<Card title="Certificate Types" icon="certificate">
+**Domain Validation (DV):**
+- Basic SSL encryption
+- Automated issuance (Let's Encrypt)
+- Suitable for development/testing
+
+**Extended Validation (EV):**
+- Enhanced trust indicators
+- Manual verification process
+- Recommended for enterprise production
+- Displays organization name in browser
+
+**Wildcard Certificates:**
+- Covers all subdomains
+- Single certificate management
+- Cost-effective for multiple services
+</Card>
+
+<Card title="Certificate Specifications" icon="key">
+**Required Specifications:**
+- **Key Length**: 2048-bit minimum, 4096-bit preferred
+- **Signature Algorithm**: SHA-256 or stronger
+- **Protocol Support**: TLS 1.2 minimum, TLS 1.3 preferred
+- **Cipher Suites**: Modern ciphers only
+- **HSTS**: HTTP Strict Transport Security enabled
+
+**SAN (Subject Alternative Names):**
+- Main domain: `agentix.yourdomain.com`
+- API subdomain: `api.yourdomain.com`
+- RTC subdomain: `rtc.yourdomain.com`
+- WebSocket: `ws.yourdomain.com`
+</Card>
+</CardGroup>
+
+### SSL Termination Strategies
+
+<AccordionGroup>
+<Accordion title="Load Balancer SSL Termination">
+**Architecture**: SSL terminated at load balancer, HTTP to backend
+
+**Advantages:**
+- Centralized certificate management
+- Reduced backend server CPU load
+- Easier SSL configuration updates
+- Better load balancer health checks
+
+**Security Considerations:**
+- Backend traffic unencrypted (use private networks)
+- Load balancer becomes critical security point
+- Requires secure internal network architecture
+
+**Use Cases:**
+- High-traffic deployments
+- Multiple backend servers
+- Complex routing requirements
+</Accordion>
+
+<Accordion title="End-to-End SSL Encryption">
+**Architecture**: SSL from client through to backend servers
+
+**Advantages:**
+- Maximum security (encrypted everywhere)
+- Compliance requirements satisfaction
+- No unencrypted internal traffic
+- Defense in depth strategy
+
+**Considerations:**
+- Higher CPU overhead on backend servers
+- Certificate management on each server
+- More complex troubleshooting
+- Potential performance impact
+
+**Use Cases:**
+- Regulatory compliance requirements
+- High-security environments
+- Untrusted internal networks
+</Accordion>
+
+<Accordion title="SSL Bridging/Re-encryption">
+**Architecture**: SSL terminated at load balancer, re-encrypted to backend
+
+**Advantages:**
+- Certificate inspection capabilities
+- Centralized SSL policy enforcement
+- Encrypted internal communications
+- Load balancer-based security features
+
+**Implementation:**
+- Load balancer terminates client SSL
+- Inspects/processes traffic as needed
+- Re-encrypts with internal certificates
+- Forwards to backend servers over SSL
+
+**Use Cases:**
+- WAF (Web Application Firewall) integration
+- SSL inspection requirements
+- Hybrid security architectures
+</Accordion>
+</AccordionGroup>
+
+## Load Balancing Strategies
+
+### Load Balancer Configuration
+
+<CardGroup cols={2}>
+<Card title="Layer 4 (TCP/UDP)" icon="network-wired">
+**TCP Load Balancing:**
+- **Algorithm**: Round-robin with health checks
+- **Session Persistence**: Source IP hashing
+- **Health Checks**: TCP connect to port 8080
+- **Timeouts**: 30s connection, 300s idle
+
+**UDP Load Balancing (RTC):**
+- **Port Range**: 50000-60000 UDP
+- **Algorithm**: Consistent hashing
+- **Session Persistence**: 5-tuple hashing
+- **Health Checks**: UDP probe packets
+
+**Advantages:**
+- Higher performance (no packet inspection)
+- WebSocket pass-through support
+- Lower latency for real-time traffic
+</Card>
+
+<Card title="Layer 7 (HTTP/HTTPS)" icon="globe">
+**HTTP Load Balancing:**
+- **Algorithm**: Least connections
+- **Health Checks**: HTTP GET /health
+- **Session Persistence**: Cookie-based
+- **SSL Offloading**: At load balancer
+
+**Advanced Features:**
+- **Content-based routing**: Path-based rules
+- **Compression**: Gzip/Brotli compression
+- **Caching**: Static asset caching
+- **WAF Integration**: Security rule enforcement
+
+**Use Cases:**
+- Complex routing requirements
+- Content optimization needs
+- Application-layer security
+</Card>
+</CardGroup>
+
+### High Availability Patterns
+
+<AccordionGroup>
+<Accordion title="Active-Passive Load Balancers">
+**Configuration:**
+- Primary load balancer handles all traffic
+- Secondary load balancer in standby mode
+- Heartbeat monitoring between units
+- Virtual IP (VIP) failover mechanism
+
+**Failover Process:**
+1. Health check detects primary failure
+2. Secondary promotes itself to active
+3. VIP moves to secondary load balancer
+4. Traffic automatically redirected
+5. DNS TTL considerations for external failover
+
+**Typical Failover Time**: 5-30 seconds
+</Accordion>
+
+<Accordion title="Active-Active Load Balancers">
+**Configuration:**
+- Multiple load balancers share traffic load
+- GeoDNS or equal-cost multi-path routing
+- Shared configuration synchronization
+- Independent health monitoring
+
+**Traffic Distribution:**
+- DNS round-robin between load balancers
+- Geographic proximity routing
+- Health-based traffic weighting
+- Automatic load redistribution on failure
+
+**Advantages:**
+- Higher total throughput capacity
+- Better resource utilization
+- Faster failover (no promotion needed)
+</Accordion>
+
+<Accordion title="Multi-Zone Load Balancing">
+**Architecture:**
+- Regional load balancers in each zone
+- Global load balancer for zone selection
+- Cross-zone health monitoring
+- Disaster recovery automation
+
+**Zone Selection Criteria:**
+- **Proximity**: Lowest latency to user
+- **Health**: Zone availability status
+- **Capacity**: Current load and resources
+- **Cost**: Regional pricing considerations
+
+**Failover Scenarios:**
+- **Zone failure**: Traffic redirected to healthy zones
+- **Partial failure**: Gradual traffic migration
+- **Maintenance**: Planned traffic drain
+- **Recovery**: Gradual traffic restoration
+</Accordion>
+</AccordionGroup>
+
+## Security Hardening
+
+### Network Security
+
+<CardGroup cols={2}>
+<Card title="Firewall Architecture" icon="shield">
+**DMZ Configuration:**
+- Public-facing load balancers only
+- Web application firewall (WAF)
+- DDoS protection mechanisms
+- Rate limiting and throttling
+
+**Internal Network:**
+- Application servers in private subnets
+- Database servers in isolated subnets
+- Management network separation
+- VPN access for administrators
+
+**Security Groups:**
+- Principle of least privilege
+- Service-specific port access
+- Source IP restrictions
+- Regular rule auditing
+</Card>
+
+<Card title="API Security" icon="lock">
+**Authentication:**
+- OAuth 2.0/OpenID Connect
+- API key management
+- JWT token validation
+- Multi-factor authentication
+
+**Authorization:**
+- Role-based access control (RBAC)
+- Resource-level permissions
+- API rate limiting
+- Request signing/validation
+
+**Monitoring:**
+- Failed authentication tracking
+- Suspicious activity detection
+- API usage analytics
+- Security event logging
+</Card>
+</CardGroup>
+
+### Production Hardening Checklist
+
+<AccordionGroup>
+<Accordion title="SSL/TLS Security">
+- [ ] **TLS 1.3** enabled and preferred
+- [ ] **Strong cipher suites** configured
+- [ ] **Perfect Forward Secrecy** enabled
+- [ ] **HSTS headers** configured
+- [ ] **Certificate chain** properly configured
+- [ ] **OCSP stapling** enabled
+- [ ] **SSL Labs A+ rating** achieved
+- [ ] **Certificate expiry monitoring** in place
+</Accordion>
+
+<Accordion title="Load Balancer Security">
+- [ ] **Rate limiting** configured per IP/user
+- [ ] **DDoS protection** enabled
+- [ ] **Geo-blocking** for restricted regions
+- [ ] **Health checks** secured (internal only)
+- [ ] **Admin interfaces** restricted to management network
+- [ ] **Logging** configured for security events
+- [ ] **WAF rules** implemented and tested
+- [ ] **SSL redirect** enforced (HTTP → HTTPS)
+</Accordion>
+
+<Accordion title="Network Security">
+- [ ] **Firewall rules** minimal and audited
+- [ ] **Security groups** properly configured
+- [ ] **VPC/VNET** isolated from other environments
+- [ ] **Private subnets** for internal services
+- [ ] **NAT gateways** for outbound access
+- [ ] **VPN access** for administration
+- [ ] **Network segmentation** between tiers
+- [ ] **Intrusion detection** deployed
+</Accordion>
+</AccordionGroup>
+
+## Monitoring and Observability
+
+### Production Monitoring Stack
+
+<CardGroup cols={2}>
+<Card title="Infrastructure Monitoring" icon="server">
+**System Metrics:**
+- CPU, memory, disk, network utilization
+- Load balancer performance and health
+- SSL certificate expiry monitoring
+- Network connectivity and latency
+
+**Application Metrics:**
+- Request throughput and response times
+- Error rates and status code distribution
+- WebSocket connection counts
+- RTC session quality metrics
+
+**Tools Integration:**
+- Prometheus for metrics collection
+- Grafana for visualization
+- AlertManager for notifications
+- Custom dashboards for business metrics
+</Card>
+
+<Card title="Security Monitoring" icon="shield-check">
+**Security Events:**
+- Failed authentication attempts
+- Suspicious API usage patterns
+- SSL/TLS handshake failures
+- Rate limiting triggers
+
+**Audit Logging:**
+- Administrative actions
+- Configuration changes
+- User access patterns
+- Data access and modifications
+
+**Incident Response:**
+- Automated threat detection
+- Security event correlation
+- Incident escalation procedures
+- Forensics data collection
+</Card>
+</CardGroup>
+
+### Performance Baselines
+
+<AccordionGroup>
+<Accordion title="Application Performance">
+**API Response Times:**
+- **Authentication endpoints**: &lt;200ms (95th percentile)
+- **Data retrieval**: &lt;100ms (95th percentile)
+- **Data modification**: &lt;300ms (95th percentile)
+- **File uploads**: Based on size, &lt;5s for 10MB
+
+**WebSocket Performance:**
+- **Connection establishment**: &lt;500ms
+- **Message latency**: &lt;50ms
+- **Concurrent connections**: Monitor per server limits
+- **Memory usage**: Track per connection overhead
+</Accordion>
+
+<Accordion title="Infrastructure Performance">
+**Load Balancer:**
+- **Request processing**: &lt;5ms additional latency
+- **SSL handshake**: &lt;100ms for new connections
+- **Health check frequency**: 5-10 second intervals
+- **Failover time**: &lt;30 seconds for planned maintenance
+
+**Network Performance:**
+- **Bandwidth utilization**: Monitor burst patterns
+- **Packet loss**: &lt;0.1% under normal conditions
+- **Inter-zone latency**: &lt;50ms for database replication
+- **DNS resolution**: &lt;50ms for external queries
+</Accordion>
+</AccordionGroup>
+
+## Disaster Recovery
+
+### Backup Strategies
+
+<CardGroup cols={2}>
+<Card title="Data Backup" icon="database">
+**Database Backups:**
+- **Frequency**: Daily full, hourly incremental
+- **Retention**: 30 days local, 90 days offsite
+- **Encryption**: AES-256 for stored backups
+- **Validation**: Weekly restore testing
+
+**Application Data:**
+- **Configuration backups**: Version controlled
+- **User-generated content**: Real-time replication
+- **Log data**: Centralized collection and archival
+- **Certificate backups**: Secure key storage
+</Card>
+
+<Card title="Infrastructure Backup" icon="server">
+**Infrastructure as Code:**
+- **Configuration management**: Ansible/Terraform
+- **Container images**: Version-tagged registry storage
+- **Network configurations**: Automated deployment scripts
+- **Security policies**: Version-controlled templates
+
+**Recovery Procedures:**
+- **Automated infrastructure provisioning**
+- **Database restore procedures**
+- **Application deployment pipelines**
+- **DNS failover processes**
+</Card>
+</CardGroup>
+
+### Recovery Time Objectives
+
+<AccordionGroup>
+<Accordion title="Service Level Targets">
+**RTO (Recovery Time Objective):**
+- **Critical services**: 15 minutes
+- **Standard services**: 1 hour
+- **Non-critical services**: 4 hours
+- **Full system recovery**: 8 hours
+
+**RPO (Recovery Point Objective):**
+- **Database**: 15 minutes (maximum data loss)
+- **User content**: 5 minutes (real-time replication)
+- **Configuration**: 1 hour (version control)
+- **Logs**: Real-time (no acceptable loss)
+</Accordion>
+
+<Accordion title="Recovery Procedures">
+**Automated Recovery:**
+- **Database failover**: Automatic promotion
+- **Application restart**: Container orchestration
+- **Traffic rerouting**: Load balancer automation
+- **DNS updates**: Health-check driven
+
+**Manual Recovery:**
+- **Infrastructure provisioning**: Runbook procedures
+- **Configuration restoration**: Step-by-step guides
+- **Data recovery validation**: Integrity checking
+- **Service testing**: Post-recovery validation
+</Accordion>
+</AccordionGroup>
+
+## Next Steps
+
+<CardGroup cols={2}>
+<Card title="Virtual Machine Setup" icon="server" href="/developer-guide/self-hosting/vm">
+  Review VM-specific deployment considerations and resource allocation
+</Card>
+
+<Card title="Network Configuration" icon="shield" href="/developer-guide/self-hosting/network-firewall">
+  Configure detailed firewall rules and network security policies
+</Card>
+</CardGroup>
+
+<CardGroup cols={2}>
+<Card title="Kubernetes Architecture" icon="dharmachakra" href="/developer-guide/self-hosting/kubernetes">
+  Explore container orchestration for large-scale deployments
+</Card>
+
+<Card title="Performance Planning" icon="chart-line" href="/developer-guide/self-hosting/benchmarks">
+  Review capacity planning and performance expectations
+</Card>
+</CardGroup>
+
+# After receiving certificate from CA
+# Place files in /etc/ssl/certs/
+sudo cp agentix.crt /etc/ssl/certs/
+sudo cp agentix.key /etc/ssl/private/
+sudo chmod 600 /etc/ssl/private/agentix.key
+```
+</Tab>
+</Tabs>
+
+<Note>
+SSL certificates must be signed by a trusted Certificate Authority. Self-signed certificates will not work with Agentix clients.
+</Note>
+
+### Load Balancer Configuration
+
+#### Nginx Configuration
+
+<CodeGroup>
+```nginx All-in-One Setup
+upstream agentix_backend {
+    server localhost:7880;
+    # Add more servers for load balancing
+    # server 10.0.0.2:7880;
+}
+
+server {
+    listen 443 ssl http2;
+    server_name agentix.yourdomain.com;
+    
+    ssl_certificate /etc/ssl/certs/agentix.crt;
+    ssl_certificate_key /etc/ssl/private/agentix.key;
+    ssl_protocols TLSv1.2 TLSv1.3;
+    
+    # WebSocket upgrade support
+    location / {
+        proxy_pass http://agentix_backend;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        
+        # Timeout settings for long-running connections
+        proxy_read_timeout 300s;
+        proxy_send_timeout 300s;
+    }
+}
+
+# Redirect HTTP to HTTPS
+server {
+    listen 80;
+    server_name agentix.yourdomain.com;
+    return 301 https://$server_name$request_uri;
+}
+```
+
+```nginx Separate Servers Setup
+# Core API server
+upstream agentix_core {
+    server 10.0.0.10:7880;
+    server 10.0.0.11:7880;
+}
+
+# RTC server
+upstream agentix_rtc {
+    server 10.0.0.20:7881;
+    server 10.0.0.21:7881;
+}
+
+server {
+    listen 443 ssl http2;
+    server_name api.yourdomain.com;
+    
+    ssl_certificate /etc/ssl/certs/api.crt;
+    ssl_certificate_key /etc/ssl/private/api.key;
+    
+    location / {
+        proxy_pass http://agentix_core;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+
+server {
+    listen 443 ssl http2;
+    server_name rtc.yourdomain.com;
+    
+    ssl_certificate /etc/ssl/certs/rtc.crt;
+    ssl_certificate_key /etc/ssl/private/rtc.key;
+    
+    location / {
+        proxy_pass http://agentix_rtc;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
